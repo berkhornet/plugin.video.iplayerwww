@@ -198,6 +198,10 @@ def ListAtoZ():
 
     Only creates the corresponding directories for each character.
     """
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'files')
+    
     characters = [
         ('A', 'a'), ('B', 'b'), ('C', 'c'), ('D', 'd'), ('E', 'e'), ('F', 'f'),
         ('G', 'g'), ('H', 'h'), ('I', 'i'), ('J', 'j'), ('K', 'k'), ('L', 'l'),
@@ -223,6 +227,10 @@ def ListChannelAtoZ():
 
     Only creates the corresponding directories for each channel.
     """
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'files')
+    
     channel_list = [
         ('bbcone',           'bbc_one_hd',              'BBC One'),
         ('bbctwo',           'bbc_two_hd',              'BBC Two'),
@@ -247,6 +255,10 @@ def GetAtoZPage(url):
 
     Creates the list of programmes for one character.
     """
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'videos')
+    
     if int(ADDON.getSetting('scrape_atoz')) == 1:
         GetSingleAtoZPage(url)
     else:
@@ -255,6 +267,10 @@ def GetAtoZPage(url):
 
 
 def GetSingleAtoZPage(url, pDialog=None):
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'videos')
+    
     current_url = 'https://www.bbc.co.uk/iplayer/a-z/%s' % url
     # print("Opening "+current_url)
     try:
@@ -346,11 +362,15 @@ def FirstShownToAired(first_shown):
 
 
 def GetEpisodes(url):
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
     new_url = 'https://www.bbc.co.uk/iplayer/episodes/%s' % url
     ScrapeEpisodes(new_url)
 
 
 def GetGroup(url):
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
     new_url = "https://www.bbc.co.uk/iplayer/group/%s" % url
     ScrapeEpisodes(new_url)
 
@@ -362,6 +382,9 @@ def ScrapeEpisodes(page_url):
     specific pages, e.g. Search, but allows to use a single function for all kinds
     of pages.
     """
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 
     with ProgressDlg(translation(30319)) as pDialog:
         html = OpenURL(page_url)
@@ -443,6 +466,9 @@ def ScrapeAtoZEpisodes(page_url):
     specific pages, e.g. Search, but allows to use a single function for all kinds
     of pages.
     """
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
 
     with ProgressDlg(translation(30319)) as pDialog:
         html = OpenURL(page_url)
@@ -504,6 +530,10 @@ def ListCategories():
     """Parses the available categories and creates directories for selecting one of them.
     The category names are scraped from the website.
     """
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'files')
+    
     html = OpenURL('https://www.bbc.co.uk/iplayer')
     match = re.compile(
         '<a href="/iplayer/categories/(.+?)/featured".*?><span class="lnk__label">(.+?)</span>'
@@ -518,6 +548,10 @@ def ListCategoryFilters(url):
     """Parses the available category filters (if available) and creates directories for selcting them.
     If there are no filters available, all programmes will be listed using GetFilteredCategory.
     """
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'files')
+    
     url = url.split('/')[0]
     NEW_URL = 'https://www.bbc.co.uk/iplayer/categories/%s/a-z' % url
 
@@ -538,6 +572,10 @@ def ListCategoryFilters(url):
 
 def GetFilteredCategory(url):
     """Parses the programmes available in the category view."""
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'videos')
+    
     NEW_URL = 'https://www.bbc.co.uk/iplayer/categories/%s/a-z' % url
 
     ScrapeEpisodes(NEW_URL)
@@ -942,6 +980,9 @@ def ParseEpisode(episode_data):
 def ListHighlights(highlights_url):
     """Creates a list of the programmes in the highlights section.
     """
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'videos')
 
     current_url = 'https://www.bbc.co.uk/%s' % highlights_url
     html = OpenURL(current_url)
@@ -953,6 +994,10 @@ def ListHighlights(highlights_url):
 
 def ListMostPopular():
     """Scrapes all episodes of the most popular page."""
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'videos')
+    
     current_url = 'https://www.bbc.co.uk/iplayer/group/most-popular'
     html = OpenURL(current_url)
 
@@ -1096,6 +1141,10 @@ def GetJsonDataWithBBCid(url, retry=True):
 
 
 def ListWatching():
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'videos')
+    
     url = "https://www.bbc.co.uk/iplayer/continue-watching"
     data = GetJsonDataWithBBCid(url)
     if not data:
@@ -1149,6 +1198,10 @@ def RemoveWatching(episode_id):
 
 def ListFavourites():
     """AKA 'Watchlist', FKA 'Added'."""
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'videos')
+    
     data = GetJsonDataWithBBCid("https://www.bbc.co.uk/iplayer/watchlist")
     if not data:
         return
@@ -1175,6 +1228,10 @@ def RemoveFavourite(programme_id):
 
 
 def ListRecommendations(item_id=None):
+    
+    # BBC-003: Custom viewtypes
+    xbmcplugin.setContent(int(sys.argv[1]), 'videos')
+    
     data = GetJsonDataWithBBCid('https://www.bbc.co.uk/iplayer')
     if not data:
         return

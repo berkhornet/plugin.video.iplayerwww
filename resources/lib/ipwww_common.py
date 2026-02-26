@@ -571,7 +571,8 @@ def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', a
     listitem.setProperty("Property(Addon.Name)", "iPlayer WWW")
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
                                 url=listitem_url, listitem=listitem, isFolder=isFolder)
-    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+    # BBC-003: Custom viewtypes
+    # xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
     return True
 
 
