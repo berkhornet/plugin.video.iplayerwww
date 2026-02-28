@@ -1158,16 +1158,23 @@ def ListWatching():
         # Lacking a field synopses, a watching item's description is empty. Since the
         # remaining playtime is presented in the title instead of the usual episode name,
         # place the original title/sub-title in the description.
-        item_data['description'] = item_data['name']
+        
+        # BBC-004: remove description which repeats program name
+        # item_data['description'] = item_data['name']
+        item_data['description'] = ""
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
             total_seconds = int(remaining_seconds * 100 / (100 - watching_item.get('progress', 0)))
-            item_data['name'] = '{} - [I]{} min left[/I]'.format(episode.get('title', ''), int(remaining_seconds / 60))
+            # BBC-004: remove "minutes left" from title
+            # item_data['name'] = '{} - [I]{} min left[/I]'.format(episode.get('title', ''), int(remaining_seconds / 60))
+            item_data['name'] = '{}'.format(episode.get('title', ''))
             # Resume a little bit earlier, so it's easier to recognise where you've left off.
             item_data['resume_time'] = str(max(total_seconds - remaining_seconds - 10, 0))
             item_data['total_time'] = str(total_seconds)
         else:
-            item_data['name'] = '{} - [I]next episode[/I]'.format(episode.get('title', ''))
+            # BBC-004: remove "next episode" from title
+            # item_data['name'] = '{} - [I]next episode[/I]'.format(episode.get('title', ''))
+            item_data['name'] = '{}'.format(episode.get('title', ''))
 
         item_data['context_mnu'] = ct_menus = []
         programme_id = episode.get('tleo_id')
