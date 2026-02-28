@@ -936,9 +936,8 @@ def ParseProgramme(progr_data, playable=False):
     else:
         programme = {
             'url': 'https://www.bbc.co.uk/iplayer/episodes/' + progr_data['id'],
-            # BBC-004: remove "x episodes available" from title
-            # 'name': '[B]{}[/B] - {} episodes available'.format(progr_data['title'], progr_data['count'])
-            'name': '{}'.format(progr_data['title'])
+            'name': '[B]{}[/B] - {} episodes available'.format(progr_data['title'], progr_data['count'])
+        }
 
     programme.update({
         'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
