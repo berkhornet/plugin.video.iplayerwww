@@ -1214,6 +1214,25 @@ def ListWatching():
         episode = watching_item['episode']
         programme = watching_item['programme']
         item_data = ParseEpisode(episode)
+        
+        # BBC-004: use image with logo for Continue Watching    
+        episode_str = str(episode)
+        # log_message('EPISODE = ' + episode_str)
+    
+        imagesdata2 = strip_before(episode_str, "promotional_with_logo")
+        # log_message('IMAGESDATA2 = ' + imagesdata2) 
+
+        imagesdata3 = strip_before(imagesdata2, "https")
+        # log_message('IMAGESDATA3 = ' + imagesdata3)
+
+        imagesdata4 = imagesdata3[:-3]
+        # log_message('IMAGESDATA4 = ' + imagesdata4)
+
+        imagesdata5 = imagesdata4.replace('{recipe}', '352x198')
+        #log_message('IMAGESDATA5 = ' + imagesdata5)
+
+        item_data['iconimage'] = imagesdata5
+        # BBC-004: END use image with logo for Continue Watching        
 
         # Lacking a field synopses, a watching item's description is empty. Since the
         # remaining playtime is presented in the title instead of the usual episode name,
