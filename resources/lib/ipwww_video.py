@@ -926,6 +926,32 @@ def SelectImage(images):
            or images.get('portrait')
            or 'DefaultFolder.png').replace('{recipe}', '832x468')
 
+# BBC-004: use image with logo for Watchlist - additional functions          
+def log_message(message, level=xbmc.LOGINFO):
+    """
+    Logs a message to the Kodi log file.
+    
+    :param message: The text to log
+    :param level: Kodi log level (default: LOGINFO)
+    """
+    try:
+        if not isinstance(message, str):
+            message = str(message)
+        xbmc.log(f"[BBC iPlayer] {message}", level)
+    except Exception as e:
+        xbmc.log(f"[BBC iPlayer] Logging failed: {e}", xbmc.LOGERROR)
+
+def strip_before(text: str, marker: str) -> str:
+    """Remove all characters before the first occurrence of marker."""
+    if not marker:
+        raise ValueError("Marker string cannot be empty.")
+    
+    index = text.find(marker)
+    if index == -1:
+        return text  # Marker not found, return original string
+    return text[index:]
+# BBC-004: END use image with logo for Watchlist - additional functions      
+
 
 def ParseProgramme(progr_data, playable=False):
     if playable:
@@ -940,11 +966,43 @@ def ParseProgramme(progr_data, playable=False):
             # 'name': '[B]{}[/B] - {} episodes available'.format(progr_data['title'], progr_data['count'])
             'name': '{}'.format(progr_data['title'])
         }
+    
+    # BBC-004: use image with logo for Watchlist    
+    programme_str = str(programme)    
+    # log_message('PROGRAMME = ' + programme_str)
+    
+    imagesdata = str(progr_data['initial_children'])
+    # log_message('IMAGESDATA = ' + imagesdata)
 
+    imagesdata2 = strip_before(imagesdata, "promotional_with_logo")
+    # log_message('IMAGESDATA2 = ' + imagesdata2) 
+
+    imagesdata3 = strip_before(imagesdata2, "https")
+    # log_message('IMAGESDATA3 = ' + imagesdata3)
+
+    imagesdata4 = imagesdata3[:-4]
+    # log_message('IMAGESDATA4 = ' + imagesdata4)
+
+    imagesdata5 = imagesdata4.replace('{recipe}', '352x198')
+    # log_message('IMAGESDATA5 = ' + imagesdata5)       
+
+    # programme.update({
+        # 'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
+        # 'description': SelectSynopsis(progr_data['synopses'])
+    # })
+    
+    # programme_str = str(programme)    
+    # log_message('PROGRAMME UPDATE 1 = ' + programme_str)
+    
     programme.update({
-        'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
+        'iconimage': imagesdata5,
         'description': SelectSynopsis(progr_data['synopses'])
     })
+    
+    # programme_str = str(programme)    
+    # log_message('PROGRAMME UPDATE 2 = ' + programme_str)
+    # BBC-004: END use image with logo for Watchlist   
+   
     return programme
 
 
