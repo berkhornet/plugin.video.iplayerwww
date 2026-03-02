@@ -652,33 +652,64 @@ def CreateBaseDirectory(content_type):
 
     if content_type == "video":
         ShowLicenceWarning()
-        if ADDON.getSetting("menu_video_highlights") == 'true':
-            AddMenuEntry(translation(30300), 'iplayer', 106, icondir+'top_rated.png', '', '')
-        if ADDON.getSetting("menu_video_channel_highlights") == 'true':
-            AddMenuEntry(translation(30317), 'url', 109, icondir+'top_rated.png', '', '')
-        if ADDON.getSetting("menu_video_most_popular") == 'true':
-            AddMenuEntry(translation(30301), 'url', 105, icondir+'popular.png', '', '')
-        if ADDON.getSetting("menu_video_az") == 'true':
-            AddMenuEntry(translation(30302), 'url', 102, icondir+'lists.png', '', '')
-        if ADDON.getSetting("menu_video_channel_az") == 'true':
-            AddMenuEntry(translation(30327), 'url', 120, icondir+'lists.png', '', '')
-        if ADDON.getSetting("menu_video_categories") == 'true':
-            AddMenuEntry(translation(30303), 'url', 103, icondir+'lists.png', '', '')
-        if ADDON.getSetting("menu_video_search") == 'true':
-            AddMenuEntry(translation(30304), 'url', 104, icondir+'search.png', '', '')
-        if ADDON.getSetting("menu_video_live") == 'true':
-            AddMenuEntry(translation(30305), 'url', 101, icondir+'tv.png', '', '')
+        # BBC-001: use iPlayer artwork
+        # if ADDON.getSetting("menu_video_highlights") == 'true':
+            # AddMenuEntry(translation(30300), 'iplayer', 106, icondir+'top_rated.png', '', '')
+        # if ADDON.getSetting("menu_video_channel_highlights") == 'true':
+            # AddMenuEntry(translation(30317), 'url', 109, icondir+'top_rated.png', '', '')
+        # if ADDON.getSetting("menu_video_most_popular") == 'true':
+            # AddMenuEntry(translation(30301), 'url', 105, icondir+'popular.png', '', '')
+        # if ADDON.getSetting("menu_video_az") == 'true':
+            # AddMenuEntry(translation(30302), 'url', 102, icondir+'lists.png', '', '')
+        # if ADDON.getSetting("menu_video_channel_az") == 'true':
+            # AddMenuEntry(translation(30327), 'url', 120, icondir+'lists.png', '', '')
+        # if ADDON.getSetting("menu_video_categories") == 'true':
+            # AddMenuEntry(translation(30303), 'url', 103, icondir+'lists.png', '', '')
+        # if ADDON.getSetting("menu_video_search") == 'true':
+            # AddMenuEntry(translation(30304), 'url', 104, icondir+'search.png', '', '')
+        # if ADDON.getSetting("menu_video_live") == 'true':
+            # AddMenuEntry(translation(30305), 'url', 101, icondir+'tv.png', '', '')
         # if ADDON.getSetting("menu_video_red_button") == 'true':
         #     AddMenuEntry(translation(30328), 'url', 118, icondir+'tv.png', '', '')
+        # if ADDON.getSetting("menu_video_uhd_trial") == 'true':
+            # AddMenuEntry(translation(30335), 'url', 197, icondir+'tv.png', '', '')
+        # if ADDON.getSetting("menu_video_watching") == 'true':
+            # AddMenuEntry(translation(30306), 'url', 107, icondir+'favourites.png', '', '')
+        # if ADDON.getSetting("menu_video_added") == 'true':
+            # AddMenuEntry(translation(30307), 'url', 108, icondir+'favourites.png', '', '')
+        # if ADDON.getSetting("menu_video_recommendations") == 'true':
+            # AddMenuEntry(translation(30336), 'url', 198, icondir+'top_rated.png', '', '')
+        # AddMenuEntry(translation(30325), 'url', 119, icondir+'settings.png',  '', '')
+        
+        if ADDON.getSetting("menu_video_highlights") == 'true':
+            AddMenuEntry(translation(30300), 'iplayer', 106, fanartpath, '', '')
+        if ADDON.getSetting("menu_video_channel_highlights") == 'true':
+            AddMenuEntry(translation(30317), 'url', 109, fanartpath, '', '')
+        if ADDON.getSetting("menu_video_most_popular") == 'true':
+            AddMenuEntry(translation(30301), 'url', 105, fanartpath, '', '')
+        if ADDON.getSetting("menu_video_az") == 'true':
+            AddMenuEntry(translation(30302), 'url', 102, fanartpath, '', '')
+        if ADDON.getSetting("menu_video_channel_az") == 'true':
+            AddMenuEntry(translation(30327), 'url', 120, fanartpath, '', '')
+        if ADDON.getSetting("menu_video_categories") == 'true':
+            AddMenuEntry(translation(30303), 'url', 103, fanartpath, '', '')
+        if ADDON.getSetting("menu_video_search") == 'true':
+            AddMenuEntry(translation(30304), 'url', 104, fanartpath, '', '')
+        if ADDON.getSetting("menu_video_live") == 'true':
+            AddMenuEntry(translation(30305), 'url', 101, fanartpath, '', '')
+        # if ADDON.getSetting("menu_video_red_button") == 'true':
+        #     AddMenuEntry(translation(30328), 'url', 118, fanartpath, '', '')
         if ADDON.getSetting("menu_video_uhd_trial") == 'true':
-            AddMenuEntry(translation(30335), 'url', 197, icondir+'tv.png', '', '')
+            AddMenuEntry(translation(30335), 'url', 197, fanartpath, '', '')
         if ADDON.getSetting("menu_video_watching") == 'true':
-            AddMenuEntry(translation(30306), 'url', 107, icondir+'favourites.png', '', '')
+            AddMenuEntry(translation(30306), 'url', 107, fanartpath, '', '')
         if ADDON.getSetting("menu_video_added") == 'true':
-            AddMenuEntry(translation(30307), 'url', 108, icondir+'favourites.png', '', '')
+            AddMenuEntry(translation(30307), 'url', 108, fanartpath, '', '')
         if ADDON.getSetting("menu_video_recommendations") == 'true':
-            AddMenuEntry(translation(30336), 'url', 198, icondir+'top_rated.png', '', '')
-        AddMenuEntry(translation(30325), 'url', 119, icondir+'settings.png',  '', '')
+            AddMenuEntry(translation(30336), 'url', 198, fanartpath, '', '')
+        AddMenuEntry(translation(30325), 'url', 119, fanartpath,  '', '')
+        # BBC-001: END use iPlayer artwork
+        
     elif content_type == "audio":
         if ADDON.getSetting("menu_radio_live") == 'true':
             AddMenuEntry(translation(30321), 'url', 113, icondir+'live.png', '', '')
