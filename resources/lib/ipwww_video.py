@@ -170,7 +170,10 @@ def ListLive():
     schedules = GetSchedules(channel_list)
     for id, name, schedule_chan_id in channel_list:
         now_on, schedule = schedules.get(schedule_chan_id, ('', ''))
-        title = '{}    [COLOR orange]{}[/COLOR]'.format(name, now_on)
+        # BBC-004: remove orange highlighting
+        # title = '{}    [COLOR orange]{}[/COLOR]'.format(name, now_on)
+        title = '{}    {}'.format(name, now_on)
+
         iconimage = 'resource://resource.images.iplayerwww/media/'+id+'.png'
 
         if ADDON.getSetting('streams_autoplay') == 'true':

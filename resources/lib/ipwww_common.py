@@ -28,6 +28,31 @@ except:
 
 ADDON = xbmcaddon.Addon(id='plugin.video.iplayerwww')
 
+# BBC-001: Use iPlayer artwork 
+HOME              = xbmcvfs.translatePath('special://userdata/')
+CUSTOMISATIONS    = os.path.join(HOME,     'customisations')
+FANARTFOLDER      = os.path.join(CUSTOMISATIONS,   'Addon Fanart')
+ICONFOLDER        = os.path.join(CUSTOMISATIONS,   'Addon Icons')
+fanartpath        = os.path.join(FANARTFOLDER,     'BBC iPlayer 3.png')
+iconpath          = os.path.join(ICONFOLDER,       'BBC iPlayer Icon v2.png')
+# BBC-001: END Use iPlayer artwork 
+
+# BBC-004: cosmetic customisation
+def log_message(message, level=xbmc.LOGINFO):
+    """
+    Logs a message to the Kodi log file.
+    
+    :param message: The text to log
+    :param level: Kodi log level (default: LOGINFO)
+    """
+    try:
+        if not isinstance(message, str):
+            message = str(message)
+        xbmc.log(f"[BBC iPlayer] {message}", level)
+    except Exception as e:
+        xbmc.log(f"[BBC iPlayer] Logging failed: {e}", xbmc.LOGERROR)
+# BBC-004: END cosmetic customisation
+
 
 class IpwwwError(Exception):
     pass
@@ -487,7 +512,9 @@ def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', a
     """
 
     if not iconimage:
-        iconimage="DefaultFolder.png"
+        # BBC-001: Use iPlayer artwork 
+        # iconimage="DefaultFolder.png"
+        iconimage=fanartpath
     listitem_url = ''.join((
         sys.argv[0],
         "?url=", utf8_quote_plus(url),
@@ -520,6 +547,16 @@ def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', a
 
     listitem = xbmcgui.ListItem(label=name, label2=description)
     listitem.setArt({'icon':'DefaultFolder.png', 'thumb':iconimage})
+    
+    # BBC-004: use fanart if relevant
+    log_message('MODE = ' + str(mode))
+    if mode == 128:
+        listitem.setArt({'fanart':iconimage})
+    if mode == 139:
+        listitem.setArt({'fanart':iconimage})
+    if mode == 202:
+        listitem.setArt({'fanart':iconimage})    
+    # BBC-004: END use fanart if relevant
 
     if mode in (201, 202, 203, 204, 205, 211, 212, 213):
         if aired:
