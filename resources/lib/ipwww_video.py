@@ -1008,8 +1008,9 @@ def ParseProgramme(progr_data, playable=False):
    
     return programme
 
-
-def ParseEpisode(episode_data):
+# CH4-004: add mode to parameters
+# def ParseEpisode(episode_data):
+def ParseEpisode(mode, episode_data):
     title = episode_data.get('title', '')
     if isinstance(title, dict):
         title= title.get('default', '')
@@ -1019,6 +1020,11 @@ def ParseEpisode(episode_data):
     if subtitle:
         title = ' - '.join((title, subtitle))
     description = SelectSynopsis(episode_data.get('synopses') or episode_data.get('synopsis'))
+    # CH4-004: set description for "Continue Watching" items which do not have a synopsis
+    #mode = mode
+    #if mode == 107:
+    description = subtitle
+    # CH4-004: END set description for "Continue Watching" items which do not have a synopsis
     duration = ''
     version_data = episode_data.get('versions')
     if version_data:
@@ -1202,21 +1208,28 @@ def GetJsonDataWithBBCid(url, retry=True):
         xbmc.log('[ipwww_video] [Error] GetJsonDataWithBBCid(): still not signed in at second attempt')
         return
 
-
-def ListWatching():
-    
+# CH4-004: allow deafult.py to pass mode
+# def ListWatching():
+def ListWatching(mode):
+   
     # BBC-003: Custom viewtypes
     xbmcplugin.setContent(int(sys.argv[1]), 'videos')
     
     url = "https://www.bbc.co.uk/iplayer/continue-watching"
     data = GetJsonDataWithBBCid(url)
+    
+    log_message('WATCHING JSON = ' + str(data))
+    
     if not data:
         return
 
     for watching_item in data['items']['elements']:
         episode = watching_item['episode']
         programme = watching_item['programme']
-        item_data = ParseEpisode(episode)
+        
+        # CH4-004: add mode to parameters
+        # item_data = ParseEpisode(episode)
+        item_data = ParseEpisode(mode, episode)
         
         # BBC-004: use image with logo for Continue Watching    
         episode_str = str(episode)
@@ -1243,7 +1256,7 @@ def ListWatching():
         
         # BBC-004: remove description which repeats program name
         # item_data['description'] = item_data['name']
-        item_data['description'] = ""
+        # item_data['description'] = ""
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
             total_seconds = int(remaining_seconds * 100 / (100 - watching_item.get('progress', 0)))
@@ -1315,9 +1328,10 @@ def RemoveFavourite(programme_id):
     DeleteUrl('https://user.ibl.api.bbc.co.uk/ibl/v1/user/adds/' + programme_id)
     xbmc.executebuiltin('Container.Refresh')
 
-
+# CH4-004: allow deafult.py to pass mode
+# def ListRecommendations(item_id=None):
 def ListRecommendations(item_id=None):
-    
+   
     # BBC-003: Custom viewtypes
     xbmcplugin.setContent(int(sys.argv[1]), 'videos')
     
@@ -1331,7 +1345,9 @@ def ListRecommendations(item_id=None):
             if bundle['id'] == item_id:
                 for recommended_item in bundle['entities']:
                     episode = recommended_item['episode']
-                    item_data = ParseEpisode(episode)
+                    # CH4-004: add mode to parameters
+                    # item_data = ParseEpisode(episode)
+                    item_data = ParseEpisode(198, episode)
                     if not item_data:
                         continue
                     tleo_id = episode.get('tleo', {}).get('id')

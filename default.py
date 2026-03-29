@@ -123,7 +123,9 @@ try:
         Video.ListHighlights(url)
 
     elif mode == 107:
-        Video.ListWatching()
+        # CH4-004: pass mode to ListWatching
+        # Video.ListWatching()
+        Video.ListWatching(mode)
 
     elif mode == 108:
         Video.ListFavourites()

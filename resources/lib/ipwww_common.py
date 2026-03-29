@@ -549,7 +549,7 @@ def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', a
     listitem.setArt({'icon':'DefaultFolder.png', 'thumb':iconimage})
     
     # BBC-004: use fanart if relevant
-    log_message('MODE = ' + str(mode))
+    # log_message('MODE = ' + str(mode))
     if mode == 128:
         listitem.setArt({'fanart':iconimage})
     if mode == 139:
