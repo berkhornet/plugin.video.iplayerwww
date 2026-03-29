@@ -1021,9 +1021,8 @@ def ParseEpisode(mode, episode_data):
         title = ' - '.join((title, subtitle))
     description = SelectSynopsis(episode_data.get('synopses') or episode_data.get('synopsis'))
     # CH4-004: set description for "Continue Watching" items which do not have a synopsis
-    #mode = mode
-    #if mode == 107:
-    description = subtitle
+    if mode == 107:
+        description = subtitle
     # CH4-004: END set description for "Continue Watching" items which do not have a synopsis
     duration = ''
     version_data = episode_data.get('versions')
