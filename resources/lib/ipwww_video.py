@@ -730,7 +730,9 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
 
     if num_episodes:
         if not main_url in added_directories:
-            title = '[B]'+item['title']+'[/B] - '+num_episodes+' episodes available'
+            # BBC-004: remove "x episodes available" from title
+            # title = '[B]'+item['title']+'[/B] - '+num_episodes+' episodes available'
+            title = item['title']
             AddMenuEntry(title, main_url, 139, icon, synopsis, '')
             added_directories.append(main_url)
 
@@ -1021,6 +1023,7 @@ def ParseEpisode(mode, episode_data):
         title = ' - '.join((title, subtitle))
     description = SelectSynopsis(episode_data.get('synopses') or episode_data.get('synopsis'))
     # CH4-004: set description for "Continue Watching" items which do not have a synopsis
+    #mode = mode
     if mode == 107:
         description = subtitle
     # CH4-004: END set description for "Continue Watching" items which do not have a synopsis
