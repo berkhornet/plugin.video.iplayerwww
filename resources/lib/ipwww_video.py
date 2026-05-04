@@ -1277,7 +1277,7 @@ def ListWatching(mode):
         description = item_data['description']        
 
         # item_data['description'] = item_data['name']
-        item_data['description'] = item_data['name'] + "No episode description available"         
+        item_data['description'] = item_data['name'] + "No episode description available."         
         
         # log_message('DESCRIPTION = ' + description)
         if description.startswith("Series"): # format is Series <series number>: <episode number>. <episode name>
@@ -1300,7 +1300,7 @@ def ListWatching(mode):
             #log_message('EPISODE_HEADER = ' + episode_header)
             color_white = "[COLOR white]"
             color_end = "[/COLOR]"
-            episode_header_colour = f"{color_white}{episode_header}{color_end}" + "No episode description available" 
+            episode_header_colour = f"{color_white}{episode_header}{color_end}" + "No episode description available." 
             item_data['description'] = episode_header_colour
         # BBC-004: END create AF3 style episode header
         
