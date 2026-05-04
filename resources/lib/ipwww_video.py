@@ -955,6 +955,21 @@ def strip_before(text: str, marker: str) -> str:
     if index == -1:
         return text  # Marker not found, return original string
     return text[index:]
+    
+def strip_after(text: str, marker: str) -> str:
+    """
+    Removes everything after the first occurrence of `marker` in `text`.
+    If marker is not found, returns the original text.
+    """
+    if not isinstance(text, str) or not isinstance(marker, str):
+        raise TypeError("Both text and marker must be strings.")
+    if marker == "":
+        raise ValueError("Marker cannot be an empty string.")
+
+    index = text.find(marker)
+    if index != -1:
+        return text[:index]  # Keep everything before marker
+    return text  # Marker not found, return original       
 # BBC-004: END use image with logo for Watchlist - additional functions      
 
 
@@ -1010,7 +1025,7 @@ def ParseProgramme(progr_data, playable=False):
    
     return programme
 
-# CH4-004: add mode to parameters
+# BBC-004: add mode to parameters
 # def ParseEpisode(episode_data):
 def ParseEpisode(mode, episode_data):
     title = episode_data.get('title', '')
@@ -1022,11 +1037,11 @@ def ParseEpisode(mode, episode_data):
     if subtitle:
         title = ' - '.join((title, subtitle))
     description = SelectSynopsis(episode_data.get('synopses') or episode_data.get('synopsis'))
-    # CH4-004: set description for "Continue Watching" items which do not have a synopsis
+    # BBC-004: set description for "Continue Watching" items which do not have a synopsis
     #mode = mode
     if mode == 107:
         description = subtitle
-    # CH4-004: END set description for "Continue Watching" items which do not have a synopsis
+    # BBC-004: END set description for "Continue Watching" items which do not have a synopsis
     duration = ''
     version_data = episode_data.get('versions')
     if version_data:
@@ -1210,7 +1225,7 @@ def GetJsonDataWithBBCid(url, retry=True):
         xbmc.log('[ipwww_video] [Error] GetJsonDataWithBBCid(): still not signed in at second attempt')
         return
 
-# CH4-004: allow deafult.py to pass mode
+# BBC-004: allow deafult.py to pass mode
 # def ListWatching():
 def ListWatching(mode):
    
@@ -1229,16 +1244,18 @@ def ListWatching(mode):
         episode = watching_item['episode']
         programme = watching_item['programme']
         
-        # CH4-004: add mode to parameters
+        # BBC-004: add mode to parameters
         # item_data = ParseEpisode(episode)
         item_data = ParseEpisode(mode, episode)
+        
+        # log_message('ITEM_DATA = ' + str(item_data))
         
         # BBC-004: use image with logo for Continue Watching    
         episode_str = str(episode)
         # log_message('EPISODE = ' + episode_str)
     
         imagesdata2 = strip_before(episode_str, "promotional_with_logo")
-        # log_message('IMAGESDATA2 = ' + imagesdata2) 
+        #log_message('IMAGESDATA2 = ' + imagesdata2) 
 
         imagesdata3 = strip_before(imagesdata2, "https")
         # log_message('IMAGESDATA3 = ' + imagesdata3)
@@ -1250,15 +1267,43 @@ def ListWatching(mode):
         #log_message('IMAGESDATA5 = ' + imagesdata5)
 
         item_data['iconimage'] = imagesdata5
-        # BBC-004: END use image with logo for Continue Watching        
+        # BBC-004: END use image with logo for Continue Watching
 
         # Lacking a field synopses, a watching item's description is empty. Since the
         # remaining playtime is presented in the title instead of the usual episode name,
         # place the original title/sub-title in the description.
         
-        # BBC-004: remove description which repeats program name
+        # BBC-004: START create AF3 style episode header
+        description = item_data['description']        
+
         # item_data['description'] = item_data['name']
-        # item_data['description'] = ""
+        item_data['description'] = item_data['name'] + "No episode description available"         
+        
+        # log_message('DESCRIPTION = ' + description)
+        if description.startswith("Series"): # format is Series <series number>: <episode number>. <episode name>
+            t1 = description[7:] # remove "Series " from start of description
+            # log_message('T1 = ' + t1)
+            series_nr = strip_after(t1,":") # obtain Series Number
+            # log_message('Season = ' + series_nr)
+            t2 = t1.find(" ")
+            # log_message('T2 = ' + str(t2))
+            t3 = t1[t2+1:]
+            # log_message('T3 = ' + t3)
+            t4 = strip_after(t3,".")
+            episode_nr = int(t4)
+            episode_nr_pad = f"{episode_nr:02d}"
+            # log_message('EPISODE_NR_PAD = ' + episode_nr_pad)
+            t5 = strip_before(t1,".")
+            episode_name = t5[2:]
+            # log_message('EPISODE_NAME = ' + episode_name)
+            episode_header = "[B]" + str(series_nr) + "x" + str(episode_nr_pad) + ". " + episode_name + "[/B][CR]" 
+            #log_message('EPISODE_HEADER = ' + episode_header)
+            color_white = "[COLOR white]"
+            color_end = "[/COLOR]"
+            episode_header_colour = f"{color_white}{episode_header}{color_end}" + "No episode description available" 
+            item_data['description'] = episode_header_colour
+        # BBC-004: END create AF3 style episode header
+        
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
             total_seconds = int(remaining_seconds * 100 / (100 - watching_item.get('progress', 0)))
@@ -1330,7 +1375,7 @@ def RemoveFavourite(programme_id):
     DeleteUrl('https://user.ibl.api.bbc.co.uk/ibl/v1/user/adds/' + programme_id)
     xbmc.executebuiltin('Container.Refresh')
 
-# CH4-004: allow deafult.py to pass mode
+# BBC-004: allow default.py to pass mode
 # def ListRecommendations(item_id=None):
 def ListRecommendations(item_id=None):
    

@@ -572,7 +572,10 @@ def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', a
                 "title": name,
                 "plot": description,
                 "plotoutline": description,
-                "mediatype" : "episode"})
+                # BBC-004: prevent "programme title" being duplicated for Continue Watching items
+                # "mediatype" : "episode"})
+                "mediatype" : "video"})
+
         if resume_time:
             listitem.setProperty('ResumeTime', resume_time)
             listitem.setProperty('TotalTime', total_time if total_time else '7200')
