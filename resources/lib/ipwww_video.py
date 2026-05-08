@@ -986,42 +986,14 @@ def ParseProgramme(progr_data, playable=False):
             # 'name': '[B]{}[/B] - {} episodes available'.format(progr_data['title'], progr_data['count'])
             'name': '{}'.format(progr_data['title'])
         }
-    
-    # BBC-004: use image with logo for Watchlist    
-    programme_str = str(programme)    
-    # log_message('PROGRAMME = ' + programme_str)
-    
-    imagesdata = str(progr_data['initial_children'])
-    # log_message('IMAGESDATA = ' + imagesdata)
 
-    imagesdata2 = strip_before(imagesdata, "promotional_with_logo")
-    # log_message('IMAGESDATA2 = ' + imagesdata2) 
-
-    imagesdata3 = strip_before(imagesdata2, "https")
-    # log_message('IMAGESDATA3 = ' + imagesdata3)
-
-    imagesdata4 = imagesdata3[:-4]
-    # log_message('IMAGESDATA4 = ' + imagesdata4)
-
-    imagesdata5 = imagesdata4.replace('{recipe}', '352x198')
-    # log_message('IMAGESDATA5 = ' + imagesdata5)       
-
-    # programme.update({
-        # 'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
-        # 'description': SelectSynopsis(progr_data['synopses'])
-    # })
-    
-    # programme_str = str(programme)    
-    # log_message('PROGRAMME UPDATE 1 = ' + programme_str)
-    
     programme.update({
-        'iconimage': imagesdata5,
+        # BBC-004: START use image with logo for Watchlist    
+        # 'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
+        'iconimage': progr_data['initial_children'][0]['images']['promotional_with_logo'].replace('{recipe}', '832x468'),
+        # BBC-004: END use image with logo for Watchlist    
         'description': SelectSynopsis(progr_data['synopses'])
-    })
-    
-    # programme_str = str(programme)    
-    # log_message('PROGRAMME UPDATE 2 = ' + programme_str)
-    # BBC-004: END use image with logo for Watchlist   
+    })  
    
     return programme
 
