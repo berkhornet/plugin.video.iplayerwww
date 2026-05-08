@@ -1007,11 +1007,6 @@ def ParseEpisode(episode_data):
     if subtitle:
         title = ' - '.join((title, subtitle))
     description = SelectSynopsis(episode_data.get('synopses') or episode_data.get('synopsis'))
-    # BBC-004: set description for "Continue Watching" items which do not have a synopsis
-    #mode = mode
-    #if mode == 107:
-        #description = subtitle
-    # BBC-004: END set description for "Continue Watching" items which do not have a synopsis
     duration = ''
     version_data = episode_data.get('versions')
     if version_data:
