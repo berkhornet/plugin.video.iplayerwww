@@ -997,9 +997,7 @@ def ParseProgramme(progr_data, playable=False):
    
     return programme
 
-# BBC-004: add mode to parameters
-# def ParseEpisode(episode_data):
-def ParseEpisode(mode, episode_data):
+def ParseEpisode(episode_data):
     title = episode_data.get('title', '')
     if isinstance(title, dict):
         title= title.get('default', '')
@@ -1011,8 +1009,8 @@ def ParseEpisode(mode, episode_data):
     description = SelectSynopsis(episode_data.get('synopses') or episode_data.get('synopsis'))
     # BBC-004: set description for "Continue Watching" items which do not have a synopsis
     #mode = mode
-    if mode == 107:
-        description = subtitle
+    #if mode == 107:
+        #description = subtitle
     # BBC-004: END set description for "Continue Watching" items which do not have a synopsis
     duration = ''
     version_data = episode_data.get('versions')
@@ -1197,28 +1195,20 @@ def GetJsonDataWithBBCid(url, retry=True):
         xbmc.log('[ipwww_video] [Error] GetJsonDataWithBBCid(): still not signed in at second attempt')
         return
 
-# BBC-004: allow deafult.py to pass mode
-# def ListWatching():
-def ListWatching(mode):
-   
+def ListWatching():   
     # BBC-003: Custom viewtypes
     xbmcplugin.setContent(int(sys.argv[1]), 'videos')
     
     url = "https://www.bbc.co.uk/iplayer/continue-watching"
     data = GetJsonDataWithBBCid(url)
-    
-    log_message('WATCHING JSON = ' + str(data))
-    
+        
     if not data:
         return
 
     for watching_item in data['items']['elements']:
         episode = watching_item['episode']
         programme = watching_item['programme']
-        
-        # BBC-004: add mode to parameters
-        # item_data = ParseEpisode(episode)
-        item_data = ParseEpisode(mode, episode)
+        item_data = ParseEpisode(episode)
 
         # BBC-004: use image with logo for Continue Watching
         item_data['iconimage'] = episode['images']['promotional_with_logo'].replace('{recipe}', '832x468')
@@ -1226,14 +1216,12 @@ def ListWatching(mode):
         # Lacking a field synopses, a watching item's description is empty. Since the
         # remaining playtime is presented in the title instead of the usual episode name,
         # place the original title/sub-title in the description.
-        
+     
         # BBC-004: START create AF3 style episode header
-        description = item_data['description']        
-
         # item_data['description'] = item_data['name']
-        item_data['description'] = item_data['name'] + "No episode description available."         
-        
-        # log_message('DESCRIPTION = ' + description)
+        description = episode['subtitle']        
+        item_data['description'] = description + "No episode description available."         
+        # Create AF3 style header if series/episode data exists
         if description.startswith("Series"): # format is Series <series number>: <episode number>. <episode name>
             t1 = description[7:] # remove "Series " from start of description
             # log_message('T1 = ' + t1)
