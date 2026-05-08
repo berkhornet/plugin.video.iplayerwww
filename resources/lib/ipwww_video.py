@@ -1263,7 +1263,7 @@ def ListWatching(mode):
         imagesdata4 = imagesdata3[:-3]
         # log_message('IMAGESDATA4 = ' + imagesdata4)
 
-        imagesdata5 = imagesdata4.replace('{recipe}', '352x198')
+        imagesdata5 = imagesdata4.replace('{recipe}', '832x468')
         #log_message('IMAGESDATA5 = ' + imagesdata5)
 
         item_data['iconimage'] = imagesdata5
