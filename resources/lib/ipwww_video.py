@@ -1227,7 +1227,10 @@ def ListWatching():
             t3 = t1[t2+1:]
             # log_message('T3 = ' + t3)
             t4 = strip_after(t3,".")
-            episode_nr = int(t4)
+            try: # obtain episode number if possible, otherwise set to 0
+                episode_nr = int(t4)
+            except Exception:
+                episode_nr = 0
             episode_nr_pad = f"{episode_nr:02d}"
             # log_message('EPISODE_NR_PAD = ' + episode_nr_pad)
             t5 = strip_before(t1,".")
