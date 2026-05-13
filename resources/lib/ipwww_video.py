@@ -1329,9 +1329,7 @@ def ListRecommendations(item_id=None):
             if bundle['id'] == item_id:
                 for recommended_item in bundle['entities']:
                     episode = recommended_item['episode']
-                    # CH4-004: add mode to parameters
-                    # item_data = ParseEpisode(episode)
-                    item_data = ParseEpisode(198, episode)
+                    item_data = ParseEpisode(episode)
                     if not item_data:
                         continue
                     tleo_id = episode.get('tleo', {}).get('id')
