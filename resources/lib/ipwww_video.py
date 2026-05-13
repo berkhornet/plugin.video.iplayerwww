@@ -27,6 +27,14 @@ from random import randint
 
 ADDON = xbmcaddon.Addon(id='plugin.video.iplayerwww')
 
+# BBC-001: Use iPlayer artwork 
+HOME              = xbmcvfs.translatePath('special://userdata/')
+CUSTOMISATIONS    = os.path.join(HOME,     'customisations')
+FANARTFOLDER      = os.path.join(CUSTOMISATIONS,   'Addon Fanart')
+ICONFOLDER        = os.path.join(CUSTOMISATIONS,   'Addon Icons')
+fanartpath        = os.path.join(FANARTFOLDER,     'BBC iPlayer 3.png')
+iconpath          = os.path.join(ICONFOLDER,       'BBC iPlayer Icon v2.png')
+# BBC-001: END Use iPlayer artwork 
 
 def tp(path):
     return xbmcvfs.translatePath(path)
@@ -1335,6 +1343,8 @@ def ListRecommendations(item_id=None):
                     item_data = ParseEpisode(episode)
                     if not item_data:
                         continue
+                    # BBC-004: use image with logo for Continue Watching                      
+                    item_data['iconimage'] = episode['image']['promotionalWithLogo'].replace('{recipe}', '832x468')
                     tleo_id = episode.get('tleo', {}).get('id')
                     if tleo_id and tleo_id != episode['id']:
                         all_episodes_link = 'https://www.bbc.co.uk/iplayer/episodes/' + tleo_id
@@ -1350,7 +1360,10 @@ def ListRecommendations(item_id=None):
             bundle_id = bundle.get('id', '')
             if bundle_id in ('recommendations', 'if-you-liked'):
                 AddMenuEntry(bundle['title']['default'], bundle_id, 198,
-                             SelectImage(bundle.get('image')), SelectSynopsis(bundle.get('synopses')))
+                             # BBC-001: Use iPlayer artwork
+                             # SelectImage(bundle.get('image')), SelectSynopsis(bundle.get('synopses')))
+                             fanartpath, SelectSynopsis(bundle.get('synopses')))
+
 
 
 
