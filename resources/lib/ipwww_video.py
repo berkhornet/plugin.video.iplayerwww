@@ -1197,11 +1197,13 @@ def ListWatching():
         try:
             description = episode['subtitle']
             title = ""
+            itemtype = ''
         except Exception: # probably a movie
             description = episode['title'] 
-            title = episode['title']            
+            title = episode['title'] 
+            itemtype = 'movie'            
         # Create AF3 style header if series/episode data exists and update item_data
-        episode_header_colour = create_af3_style_episode_header(description, title, debug)
+        episode_header_colour = create_af3_style_episode_header(description, title, debug, itemtype)
         item_data['description'] = episode_header_colour + "No plot information available."     
         # BBC-004: END create AF3 style episode header
         
@@ -1318,8 +1320,14 @@ def ListRecommendations(item_id=None):
                     except Exception:
                         category = ''
                     if 'Film' in category: # no episode header for movies
-                        subtitle = title
-                    episode_header_colour = create_af3_style_episode_header(subtitle, title, debug)
+                        itemtype = 'movie'
+                        try:
+                            subtitle = episode['subtitle']['editorial']
+                        except Exception:
+                            subtitle = title
+                    else:
+                        itemtype = ''
+                    episode_header_colour = create_af3_style_episode_header(subtitle, title, debug, itemtype)
                     # update item_data
                     item_data['description'] = episode_header_colour + plot
                     item_data['name'] = title

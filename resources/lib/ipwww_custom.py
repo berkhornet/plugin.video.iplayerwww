@@ -69,7 +69,7 @@ def strip_after(text: str, marker: str) -> str:
     return text  # Marker not found, return original       
 
 
-def create_af3_style_episode_header(subtitle, title, debug):
+def create_af3_style_episode_header(subtitle, title, debug, itemtype):
     """
     Creates an AF3 style "Episode Header" from different iPlayer episode "subtitle" formats
     
@@ -81,15 +81,15 @@ def create_af3_style_episode_header(subtitle, title, debug):
     Format 4    Episode N                                                      1xNN. Episode N             Yes
     Format 5    N. EpisodeTitle                                                1xNN. EpisodeTitle                          Yes
     Format 6    None                      ShowTitle                            1x01. ShowTitle                             Yes
-    Format 7    MovieTitle                MovieTitle                           MovieTitle                  Yes
+    Format 7    MovieTitle or tagline     MovieTitle                           MovieTitle or tagline       Yes             Yes
     """
     
     color_white = "[COLOR white]"
     color_end = "[/COLOR]"
     
     # process Format 7
-    if subtitle == title:
-         af3_episode_header = "[B]" + title + "[/B][CR]" 
+    if itemtype == 'movie':
+         af3_episode_header = "[B]" + subtitle + "[/B][CR]" 
          af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
          return af3_episode_header_colour    
     
