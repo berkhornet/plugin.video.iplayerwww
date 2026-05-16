@@ -735,15 +735,22 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
                 synopsis = item['synopses']['medium']
             elif 'small' in item['synopses']:
                 synopsis = item['synopses']['small']
-
         if 'imageTemplate' in item:
             icon = item['imageTemplate'].replace("{recipe}","832x468")
+        
+        # BBC-004: START use images with logo if available
+        # if 'images' in item:
+            # icon = item['images']['standard'].replace("{recipe}","832x468")
+        if debug == True:
+            log_message('PARSE SINGLE JSON ITEM = ' + str(item))
         if 'images' in item:
-            icon = item['images']['standard'].replace("{recipe}","832x468")
+            images = item['images']    
+            icon = custom_select_image(images)
+        # BBC-004: END use images with logo if available
+            
         elif 'sources' in item:
             temp = item['sources'][0]['srcset'].split()[0]
             icon = re.sub(r'ic/.+?/','ic/832x468/',temp)
-
 
     if num_episodes:
         if not main_url in added_directories:
