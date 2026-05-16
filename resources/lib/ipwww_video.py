@@ -42,6 +42,7 @@ from .ipwww_custom import log_message
 from .ipwww_custom import strip_before
 from .ipwww_custom import strip_after
 from .ipwww_custom import create_af3_style_episode_header
+from .ipwww_custom import custom_select_image
 # BBC-004: END import custom functions
 
 def tp(path):
@@ -1164,7 +1165,6 @@ def GetJsonDataWithBBCid(url, retry=True):
         xbmc.log('[ipwww_video] [Error] GetJsonDataWithBBCid(): still not signed in at second attempt')
         return
         
-  
 
 def ListWatching():   
     # BBC-003: Custom viewtypes
@@ -1185,7 +1185,9 @@ def ListWatching():
             log_message('WATCHING EPISODE = ' + str(episode))
             log_message('WATCHING PROGRAMME = ' + str(programme))
             log_message('WATCHING ITEMDATA = ' + str(item_data))
-        item_data['iconimage'] = episode['images']['promotional_with_logo'].replace('{recipe}', '832x468')
+            
+        images = episode['images']    
+        item_data['iconimage'] = custom_select_image(images)
         # BBC-004: END use image with logo for Continue Watching
         
         # Lacking a field synopses, a watching item's description is empty. Since the
@@ -1301,25 +1303,30 @@ def ListRecommendations(item_id=None):
                    
                     # BBC-004: START use image with logo and AF3 style episode header for Recommendations                      
                     if debug == True:
-                        log_message('EPISODE = ' + str(episode))
-                        log_message('ITEMDATA = ' + str(item_data))
-                    try:
-                        item_data['iconimage'] = episode['image']['promotionalWithLogo'].replace('{recipe}', '832x468')
-                    except Exception:
-                        item_data['iconimage'] = episode['image']['default'].replace('{recipe}', '832x468')
-                    item_data['total_time'] = episode['versions'][0]['duration']['text'].replace(' mins', '')                   
+                        log_message('RECOMMENDATIONS EPISODE = ' + str(episode))
+                        log_message('RECOMMENDATIONS ITEMDATA = ' + str(item_data))
+                    
+                    # get image
+                    images = episode['image']
+                    item_data['iconimage'] = custom_select_image(images)
+                    
+                    # get durations - not working ?
+                    item_data['total_time'] = episode['versions'][0]['duration']['text'].replace(' mins', '')
+                    
+                    # create AF3 style episode header
                     title = episode['title']['default']
                     plot = episode['synopsis']['small']                   
                     try: # establish if episode title exists
                         subtitle = str(episode['subtitle']['default'])
-                        #log_message('SUB_TITLE = ' + sub_title_str)
                     except Exception:
                         subtitle = 'None'
+                    if debug == True:
+                        log_message('RECOMMENDATIONS SUB_TITLE = ' + subtitle)
                     try: # get category
                         category = str(episode['labels']['category'])
                     except Exception:
                         category = ''
-                    if 'Film' in category: # no episode header for movies
+                    if 'Film' in category: # no episode header for movies, try a tagline
                         itemtype = 'movie'
                         try:
                             subtitle = episode['subtitle']['editorial']

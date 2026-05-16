@@ -174,4 +174,17 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
     if debug == True:
         log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)
 
-    return af3_episode_header_colour     
+    return af3_episode_header_colour 
+    
+    
+def custom_select_image(images):
+    if not images:
+        return 'DefaultFolder.png'
+    return(images.get('promotional_with_logo')
+           or images.get('promotionalWithLogo') # Recommendations
+           or images.get('promotional')
+           or images.get('standard')
+           or images.get('default') # Recommendations
+           or images.get('portrait')
+           or 'DefaultFolder.png').replace('{recipe}', '832x468') 
+    
