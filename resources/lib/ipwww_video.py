@@ -764,7 +764,9 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
         if not episodes_url in added_directories:
             if episodes_title=='':
                 episodes_title = title
-            AddMenuEntry('[B]%s[/B]' % (episodes_title),
+            # BBC-004: remove Bold highlight
+            # AddMenuEntry('[B]%s[/B]' % (episodes_title),
+            AddMenuEntry('%s' % (episodes_title),
                          episodes_url, 128, icon, synopsis, '')
             added_directories.append(main_url)
     elif main_url:
@@ -802,7 +804,9 @@ def ParseJSON(programme_data, current_url):
                                 continue
                             base_url = url_split[0]
                             series_url = base_url + '?seriesId=' + series['id']
-                            AddMenuEntry('[B]%s: %s[/B]' % (name, series['title']),
+                            # BBC-004: Remove Bold Highlight                          
+                            # AddMenuEntry('[B]%s: %s[/B]' % (name, series['title']),
+                            AddMenuEntry('%s: %s' % (name, series['title']),                            
                                          series_url, 128, '', '', '')
 
         programmes = None
@@ -830,7 +834,9 @@ def ParseJSON(programme_data, current_url):
                             continue
                         base_url = url_split[0]
                         series_url = base_url + '?seriesId=' + series['id']
-                        AddMenuEntry('[B]%s: %s[/B]' % (name, series['title']['default']),
+                        # BBC-004: Remove Bold Highlight                          
+                        # AddMenuEntry('[B]%s: %s[/B]' % (name, series['title']['default']),                      
+                        AddMenuEntry('%s: %s' % (name, series['title']['default']),
                                      series_url, 128, '', '', '')
         elif 'items' in programme_data:
             # This must be Watchlist or Continue Watching.
@@ -845,6 +851,10 @@ def ParseJSON(programme_data, current_url):
                 elif 'contentItemProps' in item:
                     meta = item.get('type')
                     item = item.get('contentItemProps')
+                # BBC-004: START use images with logo if they exist in 'item'  
+                if 'initial_children' in item:
+                    item['images'] = item['initial_children'][0]['images']
+                # BBC-004: END use images with logo if they exist in 'item'  
                 ParseSingleJSON(meta, item, name, added_playables, added_directories)
 
         # The next section is for global and channel highlights. They are a bit tricky.
@@ -866,7 +876,9 @@ def ParseJSON(programme_data, current_url):
                 if (title and id):
                     episodes_url = 'https://www.bbc.co.uk/iplayer/group/%s' % id
                     if not episodes_url in added_directories:
-                        AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
+                        # BBC-004: Remove Bold Highlight
+                        # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),                       
+                        AddMenuEntry('%s: %s' % (translation(30314), title),
                                      episodes_url, 128, '', '', '')
 
         if 'highlights' in programme_data:
@@ -898,15 +910,21 @@ def ParseJSON(programme_data, current_url):
                     if title:
                         if (id and (type == 'group')):
                             if (id == 'popular'):
-                                AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
+                                # BBC-004: Remove Bold Highlight
+                                # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),                              
+                                AddMenuEntry('%s: %s' % (translation(30314), title),
                                              'url', 105, '', '', '')
                             else:
                                 episodes_url = 'https://www.bbc.co.uk/iplayer/group/%s' % id
                                 if not episodes_url in added_directories:
-                                    AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
+                                    # BBC-004: Remove Bold Highlight
+                                    # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),                                  
+                                    AddMenuEntry('%s: %s' % (translation(30314), title),
                                                  episodes_url, 128, '', '', '')
                         if (id and (type == 'category')):
-                            AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
+                            # BBC-004: Remove Bold Highlight
+                            # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
+                            AddMenuEntry('%s: %s' % (translation(30314), title),
                                          id, 126, '', '', '')
 
     xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_TITLE)
