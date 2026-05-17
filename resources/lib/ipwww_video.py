@@ -656,8 +656,12 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
             if 'small' in subitem.get('synopsis'):
                 synopsis = subitem['synopsis'].get('small')
         if subitem.get('image'):
-            if 'default' in subitem.get('image'):
-                icon = subitem['image'].get('default').replace("{recipe}","832x468")
+            # BBC-004 START: use image with logo if available 
+            # if 'default' in subitem.get('image'):
+                # icon = subitem['image'].get('default').replace("{recipe}","832x468")
+            images = subitem['image']
+            icon = custom_select_image(images)
+            # BBC-004 END: use image with logo if available 
     else:
         if 'count' in item:
             if item['count']>1:
