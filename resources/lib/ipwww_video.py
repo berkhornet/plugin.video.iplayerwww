@@ -631,6 +631,12 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
     aired = ''
     title = ''
 
+    # BBC-008: START debug
+    if debug == True:
+        log_message('PARSESINGLEJSON META = ' + str(meta))
+        log_message('PARSESINGLEJDON ITEM = ' + str(item))
+    # BBC-008: END debug        
+        
     if 'episode' in item:
         subitem = item['episode']
         if 'id' in subitem:
@@ -655,6 +661,17 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
         if subitem.get('synopsis'):
             if 'small' in subitem.get('synopsis'):
                 synopsis = subitem['synopsis'].get('small')
+                
+        # BBC-006: START create AF3 style episode header
+        # only create if subtitle, title and synopsis exist in subitem
+        if subitem.get('subtitle') and 'default' in subitem.get('subtitle'):
+            if 'title' in subitem and 'default' in subitem.get('title'):
+                if subitem.get('synopsis') and 'small' in subitem.get('synopsis'):
+                    synopsis = create_af3_style_episode_header(subitem['subtitle'].get('default'), 
+                                                               subitem['title'].get('default'), debug, '') + subitem['synopsis'].get('small')       
+                    title = str(subitem['title'].get('default'))        
+        # BBC-006: END create AF3 style episode header
+        
         if subitem.get('image'):
             # BBC-004 START: use image with logo if available 
             # if 'default' in subitem.get('image'):
@@ -741,16 +758,19 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
                 synopsis = item['synopses']['small']
         if 'imageTemplate' in item:
             icon = item['imageTemplate'].replace("{recipe}","832x468")
-        
-        # BBC-004: START use images with logo if available
-        # if 'images' in item:
-            # icon = item['images']['standard'].replace("{recipe}","832x468")
+
+        # BBC-008: START debug
         if debug == True:
             log_message('PARSE SINGLE JSON ITEM = ' + str(item))
+        # BBC-008: END debug
+ 
+        # BBC-007: START use images with logo
+        # if 'images' in item:
+            # icon = item['images']['standard'].replace("{recipe}","832x468")
         if 'images' in item:
             images = item['images']    
             icon = custom_select_image(images)
-        # BBC-004: END use images with logo if available
+        # BBC-007: END use images with logo
             
         elif 'sources' in item:
             temp = item['sources'][0]['srcset'].split()[0]
@@ -1209,21 +1229,24 @@ def ListWatching():
         episode = watching_item['episode']
         programme = watching_item['programme']
         item_data = ParseEpisode(episode)
-        # BBC-004: START use image with logo for Continue Watching
+        
+        # BBC-008: START debug
         if debug == True:
-            log_message('WATCHING EPISODE = ' + str(episode))
-            log_message('WATCHING PROGRAMME = ' + str(programme))
-            log_message('WATCHING ITEMDATA = ' + str(item_data))
+            log_message('LISTWATCHING EPISODE = ' + str(episode))
+            log_message('LISTWATCHING PROGRAMME = ' + str(programme))
+            log_message('LISTWATCHING ITEMDATA = ' + str(item_data))
+        # BBC-008: END debug
             
+        # BBC-007: START use image with logo            
         images = episode['images']    
         item_data['iconimage'] = custom_select_image(images)
-        # BBC-004: END use image with logo for Continue Watching
+        # BBC-007: END use image with logo
         
         # Lacking a field synopses, a watching item's description is empty. Since the
         # remaining playtime is presented in the title instead of the usual episode name,
         # place the original title/sub-title in the description.
      
-        # BBC-004: START create AF3 style episode header
+        # BBC-006: START create AF3 style episode header
         # item_data['description'] = item_data['name']
         try:
             description = episode['subtitle']
@@ -1233,10 +1256,9 @@ def ListWatching():
             description = episode['title'] 
             title = episode['title'] 
             itemtype = 'movie'            
-        # Create AF3 style header if series/episode data exists and update item_data
         episode_header_colour = create_af3_style_episode_header(description, title, debug, itemtype)
         item_data['description'] = episode_header_colour + "No plot information available."     
-        # BBC-004: END create AF3 style episode header
+        # BBC-006: END create AF3 style episode header
         
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
@@ -1309,8 +1331,7 @@ def RemoveFavourite(programme_id):
     DeleteUrl('https://user.ibl.api.bbc.co.uk/ibl/v1/user/adds/' + programme_id)
     xbmc.executebuiltin('Container.Refresh')
 
-# BBC-004: allow default.py to pass mode
-# def ListRecommendations(item_id=None):
+
 def ListRecommendations(item_id=None):
    
     # BBC-003: Custom viewtypes
@@ -1330,27 +1351,33 @@ def ListRecommendations(item_id=None):
                     if not item_data:
                         continue
                    
-                    # BBC-004: START use image with logo and AF3 style episode header for Recommendations                      
+                    # BBC-008: START debug
                     if debug == True:
                         log_message('RECOMMENDATIONS EPISODE = ' + str(episode))
                         log_message('RECOMMENDATIONS ITEMDATA = ' + str(item_data))
-                    
+                    # BBC-008: END debug
+                        
+                    # BBC-007: START use image with logo                                          
                     # get image
                     images = episode['image']
-                    item_data['iconimage'] = custom_select_image(images)
-                    
+                    item_data['iconimage'] = custom_select_image(images)                    
                     # get durations - not working ?
                     item_data['total_time'] = episode['versions'][0]['duration']['text'].replace(' mins', '')
+                    # BBC-007: END use image with logo                      
                     
-                    # create AF3 style episode header
+                    # BBC-006: START create AF3 style episode header
                     title = episode['title']['default']
                     plot = episode['synopsis']['small']                   
                     try: # establish if episode title exists
                         subtitle = str(episode['subtitle']['default'])
                     except Exception:
                         subtitle = 'None'
+                        
+                    # BBC-008: START debug                       
                     if debug == True:
                         log_message('RECOMMENDATIONS SUB_TITLE = ' + subtitle)
+                    # BBC-008: END debug
+                        
                     try: # get category
                         category = str(episode['labels']['category'])
                     except Exception:
@@ -1367,7 +1394,7 @@ def ListRecommendations(item_id=None):
                     # update item_data
                     item_data['description'] = episode_header_colour + plot
                     item_data['name'] = title
-                    # BBC-004: END use image with logo and AF3 style episode header for Recommendations 
+                    # BBC-006: END create AF3 style episode header
                     
                     tleo_id = episode.get('tleo', {}).get('id')
                     if tleo_id and tleo_id != episode['id']:
