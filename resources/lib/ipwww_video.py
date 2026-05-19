@@ -667,8 +667,12 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
         if subitem.get('subtitle') and 'default' in subitem.get('subtitle'):
             if 'title' in subitem and 'default' in subitem.get('title'):
                 if subitem.get('synopsis') and 'small' in subitem.get('synopsis'):
+                    itemtype = ''
+                    subtitlex = str(subitem['subtitle']['default'])
+                    if subtitlex == 'None':
+                        itemtype = 'movie'
                     synopsis = create_af3_style_episode_header(subitem['subtitle'].get('default'), 
-                                                               subitem['title'].get('default'), debug, '') + subitem['synopsis'].get('small')       
+                                                               subitem['title'].get('default'), debug, itemtype) + subitem['synopsis'].get('small')       
                     title = str(subitem['title'].get('default'))        
         # BBC-006: END create AF3 style episode header
         

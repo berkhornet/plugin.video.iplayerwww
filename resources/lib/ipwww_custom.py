@@ -73,25 +73,35 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
     """
     Creates an AF3 style "Episode Header" from different iPlayer episode "subtitle" formats
     
-    Ref.        Input subtitle Format     Input Title Format                   Output Format           Watching    Recommendations
-    ----        ---------------------     ------------------                   -------------           --------    ---------------
-    Format 1    Series N: NN. EpisodeTitle                                     NxNN. EpisodeTitle          Yes             Yes
-    Format 2    Series N: London                                               Nx00. EpisodeTitle          Yes
-    Format 3    Series N: Episode N                                            NxNN. Episode N                             Yes
-    Format 4    Episode N                                                      1xNN. Episode N             Yes
-    Format 5    N. EpisodeTitle                                                1xNN. EpisodeTitle                          Yes
-    Format 6    None                      ShowTitle                            1x01. ShowTitle                             Yes
-    Format 7    MovieTitle or tagline     MovieTitle                           MovieTitle or tagline       Yes             Yes
+    Ref.        Input subtitle Format     Input Title Format   Output Format           Watching    Recommendations  Highlights
+    ----        ---------------------     ------------------   -------------           --------    ---------------  ----------
+    Format 1    Series N: NN. EpisodeTitle                     NxNN. EpisodeTitle          Yes             Yes
+    Format 2    Series N: London                               Nx00. EpisodeTitle          Yes
+    Format 3    Series N: Episode N                            NxNN. Episode N                             Yes
+    Format 4    Episode N                                      1xNN. Episode N             Yes
+    Format 5    N. EpisodeTitle                                1xNN. EpisodeTitle                          Yes
+    Format 5.1  Text: N. EpisodeTitle                          1xNN. EpisodeTitle                                       Yes
+    Format 5.2  Text                                           Text                                                     Yes
+    Format 6    None                      ShowTitle            1x01. ShowTitle                             Yes
+    Format 7    MovieTitle or tagline     MovieTitle           MovieTitle or tagline       Yes             Yes
     """
     
     color_white = "[COLOR white]"
     color_end = "[/COLOR]"
     
+    if debug == True:
+        log_message('CREATE_AF3_HEADER SUBTITLE = ' + str(subtitle))
+        log_message('CREATE_AF3_HEADER TITLE = ' + str(title))
+   
     # process Format 7
     if itemtype == 'movie':
-         af3_episode_header = "[B]" + subtitle + "[/B][CR]" 
-         af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
-         return af3_episode_header_colour    
+        if debug == True:
+            log_message('AF3 HEADER PROCESSING FORMAT 7 FOR TITLE = ' + title)        
+        af3_episode_header = "[B]" + title + "[/B][CR]" 
+        af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+        if debug == True:
+            log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)        
+        return af3_episode_header_colour    
     
     # process Format 6
     if subtitle == 'None':
@@ -99,6 +109,8 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
             log_message('AF3 HEADER PROCESSING FORMAT 6 FOR SUBTITLE = ' + subtitle)
         af3_episode_header = "[B]" + '1x01. ' + title + "[/B][CR]" 
         af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+        if debug == True:
+            log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)          
         return af3_episode_header_colour
    
     # process Format 4
@@ -110,25 +122,52 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
         if len(episode_1) == 1:
             episode_nr = '0' + episode_1
         else:
-            episode_nr = episode_1
+            episode_nr = episode_1           
         af3_episode_header = "[B]" + series_nr + 'x' + episode_nr + '. ' + 'Episode ' + episode_1 + "[/B][CR]"
         af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+        if debug == True:
+            log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)          
         return af3_episode_header_colour
         
     # process Format 5
     if "Series" not in subtitle and subtitle != 'None':
         if debug == True:
             log_message('AF3 HEADER PROCESSING FORMAT 5 FOR (DOES NOT CONTAIN SERIES) FOR SUBTITLE = ' + subtitle)
+
+
+        positionofcolon = subtitle.find(':') # Format 5.1
+        if positionofcolon > 0:
+            af3_episode_header = "[B]" + subtitle + "[/B][CR]"
+            af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+            if debug == True:
+                log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)         
+            return af3_episode_header_colour
+        
+        positionofperiod = subtitle.find('.')
+        episode_1 = subtitle[:positionofperiod]        
+        countofslash = subtitle.count('/') # subtitle probably a date 
+
+        if positionofperiod == -1 and countofslash < 2: # Format 5.2
+            af3_episode_header = "[B]" + subtitle + "[/B][CR]"
+            af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+            if debug == True:
+                log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)         
+            return af3_episode_header_colour
+                
         series_nr = '1'
-        index = subtitle.find('.')
-        episode_1 = subtitle[:index]        
-        if index == 1:
+        
+        if countofslash == 2: # subtitle probably a date
+            episode_nr = '00'
+            episode_title = subtitle            
+        elif positionofperiod == 1:
             episode_nr = '0' + episode_1
         else:
             episode_nr = episode_1
-        episode_title = subtitle[index + 2:]
+        episode_title = subtitle[positionofperiod + 2:]
         af3_episode_header = "[B]" + series_nr + "x" + episode_nr + ". " + episode_title + "[/B][CR]"
         af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+        if debug == True:
+            log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)         
         return af3_episode_header_colour
     
     # debug message for Formats 1 2 and 3
