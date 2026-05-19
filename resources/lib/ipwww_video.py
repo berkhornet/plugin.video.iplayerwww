@@ -1016,12 +1016,14 @@ def ParseProgramme(progr_data, playable=False):
         }
 
     programme.update({
-        # BBC-004: START use image with logo for Watchlist    
+        # BBC-007: START use image with logo  
         # 'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
-        'iconimage': progr_data['initial_children'][0]['images']['promotional_with_logo'].replace('{recipe}', '832x468'),
-        # BBC-004: END use image with logo for Watchlist    
+        'iconimage': custom_select_image(progr_data['initial_children'][0]['images']),
+        # BBC-007: END use image with logo  
         'description': SelectSynopsis(progr_data['synopses'])
-    })  
+    })          
+    
+    return programme  
    
     return programme
 
