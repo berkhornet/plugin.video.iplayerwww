@@ -90,33 +90,33 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
     color_end = "[/COLOR]"
     
     if debug == True:
-        log_message('CREATE_AF3_HEADER SUBTITLE = ' + str(subtitle))
-        log_message('CREATE_AF3_HEADER TITLE = ' + str(title))
+        log_message('create_af3_style_episode_header: subtitle = ' + str(subtitle))
+        log_message('create_af3_style_episode_header: title = ' + str(title))
    
     # process Format 7
     if itemtype == 'movie':
         if debug == True:
-            log_message('AF3 HEADER PROCESSING FORMAT 7 FOR TITLE = ' + title)        
+            log_message('create_af3_style_episode_header: Processing Format 7 for title = ' + title)        
         af3_episode_header = "[B]" + title + "[/B][CR]" 
         af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
         if debug == True:
-            log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)        
+            log_message('create_af3_style_episode_header: Format 7 output = ' + af3_episode_header_colour)        
         return af3_episode_header_colour    
     
     # process Format 6
     if subtitle == 'None':
         if debug == True:
-            log_message('AF3 HEADER PROCESSING FORMAT 6 FOR SUBTITLE = ' + subtitle)
+            log_message('create_af3_style_episode_header: Processing Format 6 for subtitle = ' + subtitle)
         af3_episode_header = "[B]" + '1x01. ' + title + "[/B][CR]" 
         af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
         if debug == True:
-            log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)          
+            log_message('create_af3_style_episode_header: Format 6 output = ' + af3_episode_header_colour)          
         return af3_episode_header_colour
    
     # process Format 4
     if subtitle.startswith("Episode"):
         if debug == True:
-            log_message('AF3 HEADER PROCESSING FORMAT 4 (STARTS WITH EPISODE) FOR SUBTITLE = ' + subtitle)
+            log_message('create_af3_style_episode_header: Processing Format 4 for subtitle = ' + subtitle)
         series_nr = "1"
         episode_1 = subtitle.replace('Episode ','')
         if len(episode_1) == 1:
@@ -126,21 +126,20 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
         af3_episode_header = "[B]" + series_nr + 'x' + episode_nr + '. ' + 'Episode ' + episode_1 + "[/B][CR]"
         af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
         if debug == True:
-            log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)          
+            log_message('create_af3_style_episode_header: Format 4 output = ' + af3_episode_header_colour)          
         return af3_episode_header_colour
         
     # process Format 5
     if "Series" not in subtitle and subtitle != 'None':
         if debug == True:
-            log_message('AF3 HEADER PROCESSING FORMAT 5 FOR (DOES NOT CONTAIN SERIES) FOR SUBTITLE = ' + subtitle)
-
+            log_message('create_af3_style_episode_header: Processing Format 5 for subtitle = ' + subtitle)
 
         positionofcolon = subtitle.find(':') # Format 5.1
         if positionofcolon > 0:
             af3_episode_header = "[B]" + subtitle + "[/B][CR]"
             af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
             if debug == True:
-                log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)         
+                log_message('create_af3_style_episode_header: Format 5.1 output = ' + af3_episode_header_colour)         
             return af3_episode_header_colour
         
         positionofperiod = subtitle.find('.')
@@ -151,7 +150,7 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
             af3_episode_header = "[B]" + subtitle + "[/B][CR]"
             af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
             if debug == True:
-                log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)         
+                log_message('create_af3_style_episode_header: Format 5.2 output = ' + af3_episode_header_colour)         
             return af3_episode_header_colour
                 
         series_nr = '1'
@@ -167,18 +166,18 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
         af3_episode_header = "[B]" + series_nr + "x" + episode_nr + ". " + episode_title + "[/B][CR]"
         af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
         if debug == True:
-            log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)         
+            log_message('create_af3_style_episode_header: Format 5 output = ' + af3_episode_header_colour)         
         return af3_episode_header_colour
     
     # debug message for Formats 1 2 and 3
     if debug == True:
-        log_message('AF3 HEADER PROCESSING for FORMATS 1 2 AND 3 FOR SUBTITLE = ' + subtitle)
+        log_message('create_af3_style_episode_header: Processing Formats  1 2 and 3 for subtitle = ' + subtitle)
         
     # reformat subtitle if input is Format 3
     index = subtitle.find('Episode') # returns -1 if not found
     if index > 1:
         if debug == True:
-            log_message('AF3 HEADER PROCESSING FORMAT 3 FOR SUBTITLE = ' + subtitle)
+            log_message('create_af3_style_episode_header: Processing Format 3 for subtitle = ' + subtitle)
         d0 = strip_before(subtitle,'Episode')
         d1 = subtitle.replace('Episode ','')
         d2 = d1 + '.'
@@ -195,11 +194,11 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
     try: # obtain episode number if possible, otherwise set to 0
         episode_nr = int(t4)
         if debug == True:
-            log_message('AF3 HEADER PROCESSING FORMAT 1/3 FOR SUBTITLE = ' + subtitle)
+            log_message('create_af3_style_episode_header: Processing Formats 1 and 3 for subtitle = ' + subtitle)
     except Exception: # Format 2
         episode_nr = 0
         if debug == True:
-            log_message('AF3 HEADER PROCESSING FORMAT 2 FOR SUBTITLE = ' + subtitle)
+            log_message('create_af3_style_episode_header: Processing Format 2 for subtitle = ' + subtitle)
     episode_nr_pad = f"{episode_nr:02d}"
     episode_nr_pad_str = str(episode_nr_pad)
     
@@ -211,7 +210,7 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
     af3_episode_header = "[B]" + str(series_nr) + "x" + episode_nr_pad_str + ". " + episode_title + "[/B][CR]" 
     af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
     if debug == True:
-        log_message('AF3 HEADER PROCESSING OUTPUT = '+ af3_episode_header_colour)
+        log_message('create_af3_style_episode_header: Format 1/2/3 output = ' + af3_episode_header_colour)
 
     return af3_episode_header_colour 
     

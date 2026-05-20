@@ -476,7 +476,9 @@ def ScrapeEpisodes(page_url):
         if int(ADDON.getSetting('paginate_episodes')) == 0:
             if current_page < next_page:
                 page_url = 'https://www.bbc.co.uk' + page_base_url + str(next_page)
-                AddMenuEntry(" [COLOR ffffa500]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
+                # BBC-004: remove colour from "Next Page" text              
+                # AddMenuEntry(" [COLOR ffffa500]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
+                AddMenuEntry(" [COLOR white]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
 
 
 def ScrapeAtoZEpisodes(page_url):
@@ -543,8 +545,9 @@ def ScrapeAtoZEpisodes(page_url):
         if int(ADDON.getSetting('paginate_episodes')) == 0:
             if current_page < next_page:
                 page_url = page_base_url + str(next_page)
-                AddMenuEntry(" [COLOR ffffa500]%s >>[/COLOR]" % translation(30320), page_url, 134, '', '', '')
-
+                # BBC-004: remove colour from "Next Page" text              
+                # AddMenuEntry(" [COLOR ffffa500]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
+                AddMenuEntry(" [COLOR white]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
 
 def ListCategories():
     """Parses the available categories and creates directories for selecting one of them.
@@ -633,8 +636,8 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
 
     # BBC-008: START debug
     if debug == True:
-        log_message('PARSESINGLEJSON META = ' + str(meta))
-        log_message('PARSESINGLEJDON ITEM = ' + str(item))
+        log_message('ParseSingleJSON: meta = ' + str(meta))
+        log_message('ParseSingleJSON: item = ' + str(item))
     # BBC-008: END debug        
         
     if 'episode' in item:
@@ -677,12 +680,12 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
         # BBC-006: END create AF3 style episode header
         
         if subitem.get('image'):
-            # BBC-004 START: use image with logo if available 
-            # if 'default' in subitem.get('image'):
+            if 'default' in subitem.get('image'):
+                # BBC-007 START: use image with logo
                 # icon = subitem['image'].get('default').replace("{recipe}","832x468")
-            images = subitem['image']
-            icon = custom_select_image(images)
-            # BBC-004 END: use image with logo if available 
+                images = subitem['image']
+                icon = custom_select_image(images)
+                # BBC-007 END: use image with logo 
     else:
         if 'count' in item:
             if item['count']>1:
@@ -763,11 +766,6 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
         if 'imageTemplate' in item:
             icon = item['imageTemplate'].replace("{recipe}","832x468")
 
-        # BBC-008: START debug
-        if debug == True:
-            log_message('PARSE SINGLE JSON ITEM = ' + str(item))
-        # BBC-008: END debug
- 
         # BBC-007: START use images with logo
         # if 'images' in item:
             # icon = item['images']['standard'].replace("{recipe}","832x468")
@@ -809,6 +807,11 @@ def ParseJSON(programme_data, current_url):
 
     added_playables = []
     added_directories = []
+    
+    # BBC-008: START debug
+    if debug == True:
+        log_message('ParseJSON: programme_data = ' + str(programme_data))
+    # BBC-008: END debug
 
     if programme_data:
         name = ''
@@ -879,10 +882,10 @@ def ParseJSON(programme_data, current_url):
                 elif 'contentItemProps' in item:
                     meta = item.get('type')
                     item = item.get('contentItemProps')
-                # BBC-004: START use images with logo if they exist in 'item'  
+                # BBC-007: START use images with logo if they exist in 'item'  
                 if 'initial_children' in item:
                     item['images'] = item['initial_children'][0]['images']
-                # BBC-004: END use images with logo if they exist in 'item'  
+                # BBC-007: END use images with logo if they exist in 'item'  
                 ParseSingleJSON(meta, item, name, added_playables, added_directories)
 
         # The next section is for global and channel highlights. They are a bit tricky.
@@ -1014,7 +1017,7 @@ def ParseProgramme(progr_data, playable=False):
             # 'name': '[B]{}[/B] - {} episodes available'.format(progr_data['title'], progr_data['count'])
             'name': '{}'.format(progr_data['title'])
         }
-
+        
     programme.update({
         # BBC-007: START use image with logo  
         # 'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
@@ -1023,8 +1026,6 @@ def ParseProgramme(progr_data, playable=False):
         'description': SelectSynopsis(progr_data['synopses'])
     })          
     
-    return programme  
-   
     return programme
 
 def ParseEpisode(episode_data):
@@ -1238,9 +1239,9 @@ def ListWatching():
         
         # BBC-008: START debug
         if debug == True:
-            log_message('LISTWATCHING EPISODE = ' + str(episode))
-            log_message('LISTWATCHING PROGRAMME = ' + str(programme))
-            log_message('LISTWATCHING ITEMDATA = ' + str(item_data))
+            log_message('ListWatching: episode = ' + str(episode))
+            log_message('ListWatching: programme = ' + str(programme))
+            log_message('ListWatching: item_data = ' + str(item_data))
         # BBC-008: END debug
             
         # BBC-007: START use image with logo            
@@ -1359,8 +1360,8 @@ def ListRecommendations(item_id=None):
                    
                     # BBC-008: START debug
                     if debug == True:
-                        log_message('RECOMMENDATIONS EPISODE = ' + str(episode))
-                        log_message('RECOMMENDATIONS ITEMDATA = ' + str(item_data))
+                        log_message('ListRecommendations: episode = ' + str(episode))
+                        log_message('ListRecommendations: item_data = ' + str(item_data))
                     # BBC-008: END debug
                         
                     # BBC-007: START use image with logo                                          
@@ -1381,7 +1382,7 @@ def ListRecommendations(item_id=None):
                         
                     # BBC-008: START debug                       
                     if debug == True:
-                        log_message('RECOMMENDATIONS SUB_TITLE = ' + subtitle)
+                        log_message('ListRecommendations: subtitle = ' + subtitle)
                     # BBC-008: END debug
                         
                     try: # get category
