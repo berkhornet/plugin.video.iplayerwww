@@ -690,32 +690,32 @@ def CreateBaseDirectory(content_type):
         AddMenuEntry(translation(30325), 'url', 119, icondir+'settings.png',  '', '')
         """
 
+        if ADDON.getSetting("menu_video_added") == 'true':
+            AddMenuEntry(translation(30307), 'url', 108, media_dir+'My List.png', '', '')        
+        if ADDON.getSetting("menu_video_watching") == 'true':
+            AddMenuEntry(translation(30306), 'url', 107, media_dir+'Continue Watching.png', '', '')
+        if ADDON.getSetting("menu_video_categories") == 'true':
+            AddMenuEntry(translation(30303), 'url', 103, media_dir+'Categories.png', '', '')            
         if ADDON.getSetting("menu_video_highlights") == 'true':
             AddMenuEntry(translation(30300), 'iplayer', 106, media_dir+'Highlights.png', '', '')
-        if ADDON.getSetting("menu_video_channel_highlights") == 'true':
-            AddMenuEntry(translation(30317), 'url', 109, media_dir+'Highlights.png', '', '')
+        # if ADDON.getSetting("menu_video_channel_highlights") == 'true':
+             #AddMenuEntry(translation(30317), 'url', 109, media_dir+'Highlights.png', '', '')
         if ADDON.getSetting("menu_video_most_popular") == 'true':
             AddMenuEntry(translation(30301), 'url', 105, media_dir+'Most Popular.png', '', '')
+        if ADDON.getSetting("menu_video_recommendations") == 'true':
+            AddMenuEntry(translation(30336), 'url', 198, media_dir+'Recommendations.png', '', '')            
         if ADDON.getSetting("menu_video_az") == 'true':
             AddMenuEntry(translation(30302), 'url', 102, media_dir+'My List.png', '', '')
         if ADDON.getSetting("menu_video_channel_az") == 'true':
             AddMenuEntry(translation(30327), 'url', 120, media_dir+'My List.png', '', '')
-        if ADDON.getSetting("menu_video_categories") == 'true':
-            AddMenuEntry(translation(30303), 'url', 103, media_dir+'Categories.png', '', '')
-        if ADDON.getSetting("menu_video_search") == 'true':
-            AddMenuEntry(translation(30304), 'url', 104, media_dir+'Search.png', '', '')
         if ADDON.getSetting("menu_video_live") == 'true':
             AddMenuEntry(translation(30305), 'url', 101, media_dir+'Live TV.png', '', '')
         # if ADDON.getSetting("menu_video_red_button") == 'true':
             # AddMenuEntry(translation(30328), 'url', 118, media_dir+'Live Tv.png', '', '')
         if ADDON.getSetting("menu_video_uhd_trial") == 'true':
-            AddMenuEntry(translation(30335), 'url', 197, media_dir+'Live TV.png', '', '')
-        if ADDON.getSetting("menu_video_watching") == 'true':
-            AddMenuEntry(translation(30306), 'url', 107, media_dir+'Continue Watching.png', '', '')
-        if ADDON.getSetting("menu_video_added") == 'true':
-            AddMenuEntry(translation(30307), 'url', 108, media_dir+'Recommendations.png', '', '')
-        if ADDON.getSetting("menu_video_recommendations") == 'true':
-            AddMenuEntry(translation(30336), 'url', 198, media_dir+'Recommendations.png', '', '')
+            AddMenuEntry(translation(30335), 'url', 197, media_dir+'Live TV.png', '', '')            
+        if ADDON.getSetting("menu_video_search") == 'true':
+            AddMenuEntry(translation(30304), 'url', 104, media_dir+'Search.png', '', '')
         AddMenuEntry(translation(30325), 'url', 119, media_dir+'Settings.png',  '', '')
         # BBC-009: END custon main menu
                 
