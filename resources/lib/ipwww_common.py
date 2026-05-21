@@ -39,7 +39,7 @@ iconpath          = os.path.join(ICONFOLDER,       'BBC iPlayer Icon v2.png')
 
 # BBC-009: START Custom root (Main menu)
 import xbmcvfs
-media_dir = xbmcvfs.translatePath('special://userdata/customisations/Addon Icons/VOD Addon Artwork/')
+media_dir = xbmcvfs.translatePath('special://userdata/customisations/Addon Icons/VOD Addon Artwork/BBC iPlayer/')
 # BBC-009: END Custom root (Main menu)
 
 # BBC-008: START debug
@@ -711,7 +711,7 @@ def CreateBaseDirectory(content_type):
         if ADDON.getSetting("menu_video_uhd_trial") == 'true':
             AddMenuEntry(translation(30335), 'url', 197, media_dir+'Live TV.png', '', '')
         if ADDON.getSetting("menu_video_watching") == 'true':
-            AddMenuEntry(translation(30306), 'url', 107, media_dir+'Continue Watching v2.png', '', '')
+            AddMenuEntry(translation(30306), 'url', 107, media_dir+'Continue Watching.png', '', '')
         if ADDON.getSetting("menu_video_added") == 'true':
             AddMenuEntry(translation(30307), 'url', 108, media_dir+'Recommendations.png', '', '')
         if ADDON.getSetting("menu_video_recommendations") == 'true':
