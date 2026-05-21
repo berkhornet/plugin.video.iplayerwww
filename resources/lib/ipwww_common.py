@@ -37,7 +37,12 @@ fanartpath        = os.path.join(FANARTFOLDER,     'BBC iPlayer 3.png')
 iconpath          = os.path.join(ICONFOLDER,       'BBC iPlayer Icon v2.png')
 # BBC-001: END Use iPlayer artwork 
 
-# BBC-004: cosmetic customisation
+# BBC-009: START Custom root (Main menu)
+import xbmcvfs
+media_dir = xbmcvfs.translatePath('special://userdata/customisations/Addon Icons/VOD Addon Artwork/')
+# BBC-009: END Custom root (Main menu)
+
+# BBC-008: START debug
 def log_message(message, level=xbmc.LOGINFO):
     """
     Logs a message to the Kodi log file.
@@ -51,8 +56,7 @@ def log_message(message, level=xbmc.LOGINFO):
         xbmc.log(f"[BBC iPlayer] {message}", level)
     except Exception as e:
         xbmc.log(f"[BBC iPlayer] Logging failed: {e}", xbmc.LOGERROR)
-# BBC-004: END cosmetic customisation
-
+# BBC-008: END debug
 
 class IpwwwError(Exception):
     pass
@@ -655,7 +659,8 @@ def CreateBaseDirectory(content_type):
 
     if content_type == "video":
         ShowLicenceWarning()
-        #BBC-001: use iPlayer artwork
+        # BBC-009: START custon main menu
+        """
         if ADDON.getSetting("menu_video_highlights") == 'true':
             AddMenuEntry(translation(30300), 'iplayer', 106, icondir+'top_rated.png', '', '')
         if ADDON.getSetting("menu_video_channel_highlights") == 'true':
@@ -683,37 +688,38 @@ def CreateBaseDirectory(content_type):
         if ADDON.getSetting("menu_video_recommendations") == 'true':
             AddMenuEntry(translation(30336), 'url', 198, icondir+'top_rated.png', '', '')
         AddMenuEntry(translation(30325), 'url', 119, icondir+'settings.png',  '', '')
-        
         """
+
         if ADDON.getSetting("menu_video_highlights") == 'true':
-            AddMenuEntry(translation(30300), 'iplayer', 106, fanartpath, '', '')
+            AddMenuEntry(translation(30300), 'iplayer', 106, media_dir+'Highlights.png', '', '')
         if ADDON.getSetting("menu_video_channel_highlights") == 'true':
-            AddMenuEntry(translation(30317), 'url', 109, fanartpath, '', '')
+            AddMenuEntry(translation(30317), 'url', 109, media_dir+'Highlights.png', '', '')
         if ADDON.getSetting("menu_video_most_popular") == 'true':
-            AddMenuEntry(translation(30301), 'url', 105, fanartpath, '', '')
+            AddMenuEntry(translation(30301), 'url', 105, media_dir+'Most Popular.png', '', '')
         if ADDON.getSetting("menu_video_az") == 'true':
-            AddMenuEntry(translation(30302), 'url', 102, fanartpath, '', '')
+            AddMenuEntry(translation(30302), 'url', 102, media_dir+'My List.png', '', '')
         if ADDON.getSetting("menu_video_channel_az") == 'true':
-            AddMenuEntry(translation(30327), 'url', 120, fanartpath, '', '')
+            AddMenuEntry(translation(30327), 'url', 120, media_dir+'My List.png', '', '')
         if ADDON.getSetting("menu_video_categories") == 'true':
-            AddMenuEntry(translation(30303), 'url', 103, fanartpath, '', '')
+            AddMenuEntry(translation(30303), 'url', 103, media_dir+'Categories.png', '', '')
         if ADDON.getSetting("menu_video_search") == 'true':
-            AddMenuEntry(translation(30304), 'url', 104, fanartpath, '', '')
+            AddMenuEntry(translation(30304), 'url', 104, media_dir+'Search.png', '', '')
         if ADDON.getSetting("menu_video_live") == 'true':
-            AddMenuEntry(translation(30305), 'url', 101, fanartpath, '', '')
+            AddMenuEntry(translation(30305), 'url', 101, media_dir+'Live TV.png', '', '')
         # if ADDON.getSetting("menu_video_red_button") == 'true':
-        #     AddMenuEntry(translation(30328), 'url', 118, fanartpath, '', '')
+            # AddMenuEntry(translation(30328), 'url', 118, media_dir+'Live Tv.png', '', '')
         if ADDON.getSetting("menu_video_uhd_trial") == 'true':
-            AddMenuEntry(translation(30335), 'url', 197, fanartpath, '', '')
+            AddMenuEntry(translation(30335), 'url', 197, media_dir+'Live TV.png', '', '')
         if ADDON.getSetting("menu_video_watching") == 'true':
-            AddMenuEntry(translation(30306), 'url', 107, fanartpath, '', '')
+            AddMenuEntry(translation(30306), 'url', 107, media_dir+'Continue Watching v2.png', '', '')
         if ADDON.getSetting("menu_video_added") == 'true':
-            AddMenuEntry(translation(30307), 'url', 108, fanartpath, '', '')
+            AddMenuEntry(translation(30307), 'url', 108, media_dir+'Recommendations.png', '', '')
         if ADDON.getSetting("menu_video_recommendations") == 'true':
-            AddMenuEntry(translation(30336), 'url', 198, fanartpath, '', '')
-        AddMenuEntry(translation(30325), 'url', 119, fanartpath,  '', '')
-        # BBC-001: END use iPlayer artwork
-        """
+            AddMenuEntry(translation(30336), 'url', 198, media_dir+'Recommendations.png', '', '')
+        AddMenuEntry(translation(30325), 'url', 119, media_dir+'Settings.png',  '', '')
+        # BBC-009: END custon main menu
+                
+ 
     elif content_type == "audio":
         if ADDON.getSetting("menu_radio_live") == 'true':
             AddMenuEntry(translation(30321), 'url', 113, icondir+'live.png', '', '')
