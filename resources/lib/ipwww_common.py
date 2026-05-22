@@ -39,7 +39,7 @@ iconpath          = os.path.join(ICONFOLDER,       'BBC iPlayer Icon v2.png')
 
 # BBC-009: START Custom root (Main menu)
 import xbmcvfs
-media_dir = xbmcvfs.translatePath('special://userdata/customisations/Addon Icons/VOD Addon Artwork/BBC iPlayer/')
+media_dir = xbmcvfs.translatePath('special://userdata/customisations/Addon Icons/VOD Addon Artwork/BBC iPlayer v2/')
 # BBC-009: END Custom root (Main menu)
 
 # BBC-008: START debug
