@@ -46,7 +46,9 @@ from .ipwww_custom import custom_select_image
 from .ipwww_custom import get_episode_data
 import requests
 from .ipwww_custom import get_episode_plot
-from .ipwww_custom import get_tmdb_id_for_show
+from .ipwww_custom import get_movie_plot
+#from .ipwww_custom import get_tmdb_id_for_show
+from .ipwww_custom import search_tmdb
 # BBC-004: END import custom functions
 
 # BBC-010: START def CheckAutoplay_episode            
@@ -1263,10 +1265,6 @@ def ListWatching():
         images = episode['images']    
         item_data['iconimage'] = custom_select_image(images)
         # BBC-007: END use image with logo
-        
-        # Lacking a field synopses, a watching item's description is empty. Since the
-        # remaining playtime is presented in the title instead of the usual episode name,
-        # place the original title/sub-title in the description.
 
         # BBC-010: START extract episode title, season number and episode number from episode data
         try:
@@ -1282,15 +1280,23 @@ def ListWatching():
         item_data['description'] = "No plot information available."        
         # BBC-010: END extract episode title, season number and episode number from episode data
          
-        if isEpisode == True:
-            tmdb_id = get_tmdb_id_for_show(episode['title'])
-            if tmdb_id == None:
-                item_data['description'] = "No plot information available."        
-            else:                
-                tmdb_episode_plot = get_episode_plot(tmdb_id, int(season_nr), int(episode_nr))
-                item_data['description'] = tmdb_episode_plot
+        # BBC-010: START get plot from TMDb if possible 
 
- 
+        # Lacking a field synopses, a watching item's description is empty. Since the
+        # remaining playtime is presented in the title instead of the usual episode name,
+        # place the original title/sub-title in the description.
+        
+        tmdb_id, tmdb_type = search_tmdb('tv', episode['title']) # try to get tmdb_id for tvshow
+        if tmdb_id == None:
+            tmdb_id, tmdb_type = search_tmdb('movie', episode['title'])  # if not found try to get tmdb_id for tvshow
+            if tmdb_id == None:
+                item_data['description'] = "Movie: No plot information available."        
+            else: 
+                item_data['description'] = get_movie_plot(tmdb_id) # get plot for movie using tmdb_id          
+        else: # we have tvshow tmdb_id              
+            item_data['description']  = get_episode_plot(tmdb_id, int(season_nr), int(episode_nr))  # get plot for tvshow using tmdb_id   
+        # BBC-010: END get plot from TMDb if possible      
+
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
             total_seconds = int(remaining_seconds * 100 / (100 - watching_item.get('progress', 0)))

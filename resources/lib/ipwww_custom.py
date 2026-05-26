@@ -369,47 +369,39 @@ def get_episode_data(subtitle, title, debug, itemtype):
     
     
 # BBC-010: START functions to get episode plot via TMDb API
-def get_tmdb_id_for_show(show_name):
+ #def get_tmdb_id_for_show(show_name):
+def search_tmdb(category, name):
+    
     """
-    Search TMDb for a TV show and return its TMDb ID.
+    Search TMDb for a TV show or movie and return (tmdb_id, type) if exact match is found.
+    category: 'tv' or 'movie'
     """
-    TMDB_API_KEY = "e92d7c9d19df047c576ee8724f174e07"
-
-    if not show_name.strip():
-        raise ValueError("Show name cannot be empty.")
-
-    url = "https://api.themoviedb.org/3/search/tv"
-    params = {
-        "api_key": TMDB_API_KEY,
-        "query": show_name,
-        "language": "en-US",
-        "page": 1
-    }
+    
+    API_KEY = "e92d7c9d19df047c576ee8724f174e07"  # Replace with your TMDb API key
+    BASE_URL = "https://api.themoviedb.org/3"
+    
+    if not name or not isinstance(name, str):
+        raise ValueError("Name must be a non-empty string.")
 
     try:
-        response = requests.get(url, params=params, timeout=10)
+        response = requests.get(
+            f"{BASE_URL}/search/{category}",
+            params={"api_key": API_KEY, "query": name.strip()},
+            timeout=10
+        )
         response.raise_for_status()
         data = response.json()
 
-        results = data.get("results", [])
-        if not results:
-            log_message('get_tmdb_id_for_show: No results found for ' + show_name)
-            return None
+        for result in data.get("results", []):
+            title_field = "name" if category == "tv" else "title"
+            if result.get(title_field, "").strip().lower() == name.strip().lower():
+                return result.get("id"), ("tvshow" if category == "tv" else "movie")
 
-        # Take the first match
-        first_result = results[0]
-        tmdb_id = first_result.get("id")
-        name = first_result.get("name")
-        first_air_date = first_result.get("first_air_date", "Unknown")
-        log_message('get_tmdb_id_for_show: show: ' + name + ' first air date: ' + str(first_air_date) + ' TMDb ID: ' + str(tmdb_id))
-        return tmdb_id
+        return None, None
 
     except requests.exceptions.RequestException as e:
         print(f"Network/API error: {e}")
-        return None
-    except ValueError as ve:
-        print(f"Value error: {ve}")
-        return None
+        return None, None
         
         
 def get_episode_plot(tv_id, season_number, episode_number):
@@ -448,4 +440,51 @@ def get_episode_plot(tv_id, season_number, episode_number):
         return f"Request error occurred: {req_err}"
     except Exception as e:
         return f"Unexpected error: {e}"
+        
+
+def get_movie_plot(tmdb_id):
+    
+    """
+    Fetches the movie plot (overview) from TMDb using the movie's TMDb ID.
+
+    Args:
+        tmdb_id (int): The TMDb movie ID.
+        api_key (str): Your TMDb API key.
+
+    Returns:
+        str: The movie plot if found, otherwise an error message.
+    """
+    
+    api_key = "e92d7c9d19df047c576ee8724f174e07"  # Replace with your TMDB API key
+    
+    if not isinstance(tmdb_id, int) or tmdb_id <= 0:
+        return "Error: tmdb_id must be a positive integer."
+
+    if not api_key or not isinstance(api_key, str):
+        return "Error: A valid TMDb API key is required."
+
+    url = f"https://api.themoviedb.org/3/movie/{tmdb_id}"
+    params = {
+        "api_key": api_key,
+        "language": "en-US"
+    }
+
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()  # Raise HTTPError for bad responses
+        data = response.json()
+
+        # Check if 'overview' exists
+        plot = data.get("overview")
+        if plot:
+            return plot.strip()
+        else:
+            return "No plot available for this movie."
+
+    except requests.exceptions.HTTPError as http_err:
+        return f"HTTP error occurred: {http_err}"
+    except requests.exceptions.RequestException as req_err:
+        return f"Request error occurred: {req_err}"
+    except ValueError:
+        return "Error parsing the response."        
 # BBC-010: END functions to get episode plot via TMDb API
