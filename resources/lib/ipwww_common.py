@@ -619,6 +619,92 @@ def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', a
     # xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
     return True
 
+# BBC-010: START def AddMenuEntry_episode
+def AddMenuEntry_episode(show_title, episode_title, season, episode, episode_fanart, name, url, mode, iconimage, description='', subtitles_url='', aired=None, resolution=None,
+                 resume_time='', total_time='', episode_id='', stream_id='', context_mnu=None, replay_chan_id=''):
+    """Adds a new line to the Kodi list of playables.
+    It is used in multiple ways in the plugin, which are distinguished by modes.
+    """
+
+    if not iconimage:
+        # BBC-001: Use iPlayer artwork 
+        # iconimage="DefaultFolder.png"
+        iconimage=fanartpath
+    listitem_url = ''.join((
+        sys.argv[0],
+        "?url=", utf8_quote_plus(url),
+        "&mode=", str(mode),
+        "&name=", utf8_quote_plus(name),
+        "&iconimage=", utf8_quote_plus(iconimage),
+        "&description=", utf8_quote_plus(description),
+        "&subtitles_url=", utf8_quote_plus(subtitles_url),
+        "&episode_id=", utf8_quote_plus(episode_id),
+        "&stream_id=", utf8_quote_plus(stream_id),
+        "&resume_time=", resume_time,
+        "&total_time=", total_time,
+        "&replay_chan_id=", replay_chan_id))
+    if mode in (101,203,113,213):
+        listitem_url = listitem_url + "&time=" + str(time.time())
+    if aired:
+        ymd = aired.split('-')
+        date_string = ymd[2] + '/' + ymd[1] + '/' + ymd[0]
+    else:
+        date_string = ""
+
+    # Modes 201-299 will create a new playable line, otherwise create a new directory line.
+    if mode in (201, 202, 203, 204, 205, 211, 212, 213, 214):
+        isFolder = False
+    # Mode 119 is not a folder, but it is also not a playable.
+    elif mode == 119:
+        isFolder = False
+    else:
+        isFolder = True
+
+    listitem = xbmcgui.ListItem(label=name, label2=description)
+    
+    listitem.setArt({'icon':'DefaultFolder.png', 'thumb':iconimage})
+    listitem.setArt({'fanart': ''})
+
+    listitem.setInfo("video", {
+        "tvshowtitle": show_title,
+        "season": season,
+        "episode": episode,
+        "title": episode_title,
+        "plot": description,
+        "plotoutline": description,
+        "mediatype" : "episode"})
+    
+    if aired:
+        listitem.setInfo("video", {
+            "date": date_string,
+            "aired": aired})        
+
+    if resume_time:
+        listitem.setProperty('ResumeTime', resume_time)
+        listitem.setProperty('TotalTime', total_time if total_time else '7200')
+
+    if context_mnu:
+        listitem.addContextMenuItems(context_mnu)
+
+    video_streaminfo = {'codec': 'h264'}
+    if not isFolder:
+        listitem.setPath(url)
+        listitem.setProperty('inputstream', 'inputstream.adaptive')
+        listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+
+    # Mode 119 is not a folder, but it is also not a playable.
+    if mode == 119:
+        listitem.setProperty("IsPlayable", 'false')
+    else:
+        listitem.setProperty("IsPlayable", str(not isFolder).lower())
+    listitem.setProperty("IsFolder", str(isFolder).lower())
+    listitem.setProperty("Property(Addon.Name)", "iPlayer WWW")
+    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                url=listitem_url, listitem=listitem, isFolder=isFolder)
+
+    return True     
+# BBC-010: END def AddMenuEntry_episode
+
 
 def KidsMode():
     dialog = xbmcgui.Dialog()

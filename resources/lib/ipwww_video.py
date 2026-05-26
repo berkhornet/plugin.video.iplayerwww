@@ -15,7 +15,7 @@ from operator import itemgetter
 from resources.lib.ipwww_common import (
     translation, AddMenuEntry, OpenURL, OpenRequest, CheckLogin, CreateBaseDirectory,
     GetCookieJar, ParseImageUrl, download_subtitles, GeoBlockedError, WebRequestError,
-    iso_duration_2_seconds, PostJson, strptime, addonid, DeleteUrl, ProgressDlg)
+    iso_duration_2_seconds, PostJson, strptime, addonid, DeleteUrl, ProgressDlg, AddMenuEntry_episode)
 from resources.lib import ipwww_progress
 
 import xbmc
@@ -43,7 +43,19 @@ from .ipwww_custom import strip_before
 from .ipwww_custom import strip_after
 from .ipwww_custom import create_af3_style_episode_header
 from .ipwww_custom import custom_select_image
+from .ipwww_custom import get_episode_data
 # BBC-004: END import custom functions
+
+# BBC-010: START def CheckAutoplay_episode            
+def CheckAutoplay_episode(showtitle, episode_title, season, episode, episode_fanart, name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
+    if ADDON.getSetting('streams_autoplay') == 'true':
+        mode = 202
+    else:
+        mode = 122
+    AddMenuEntry_episode(showtitle, episode_title, season, episode, episode_fanart, name, url, mode, iconimage, description, '', aired=aired,
+                 resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)
+# BBC-010: END def CheckAutoplay_episode
+            
 
 def tp(path):
     return xbmcvfs.translatePath(path)
@@ -1224,7 +1236,7 @@ def GetJsonDataWithBBCid(url, retry=True):
 
 def ListWatching():   
     # BBC-003: Custom viewtypes
-    xbmcplugin.setContent(int(sys.argv[1]), 'videos')
+    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
     
     url = "https://www.bbc.co.uk/iplayer/continue-watching"
     data = GetJsonDataWithBBCid(url)
@@ -1252,9 +1264,8 @@ def ListWatching():
         # Lacking a field synopses, a watching item's description is empty. Since the
         # remaining playtime is presented in the title instead of the usual episode name,
         # place the original title/sub-title in the description.
-     
-        # BBC-006: START create AF3 style episode header
-        # item_data['description'] = item_data['name']
+
+        # BBC-010: START extract episode title, season number and episode number from episode data
         try:
             description = episode['subtitle']
             title = ""
@@ -1262,10 +1273,11 @@ def ListWatching():
         except Exception: # probably a movie
             description = episode['title'] 
             title = episode['title'] 
-            itemtype = 'movie'            
-        episode_header_colour = create_af3_style_episode_header(description, title, debug, itemtype)
-        item_data['description'] = episode_header_colour + "No plot information available."     
-        # BBC-006: END create AF3 style episode header
+            itemtype = 'movie'  
+        isEpisode, episode_title, season_nr, episode_nr = get_episode_data(description, title, debug, itemtype)
+        item_data['name'] = episode_title
+        item_data['description'] = "No plot information available."        
+        # BBC-010: END extract episode title, season number and episode number from episode data
         
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
@@ -1295,7 +1307,14 @@ def ListWatching():
             ct_menus.append((translation(30601),
                              f'RunPlugin(plugin://plugin.video.iplayerwww?mode=301&episode_id={programme_id}&url=url)'))
 
-        CheckAutoplay(**item_data)
+        # BBC-010: START custom AddMenuEntry
+        episode_fanart = episode['images']['standard'].replace('{recipe}', '832x468')
+        if isEpisode == True:
+            show_title = episode['title']
+            CheckAutoplay_episode(show_title, episode_title, season_nr, episode_nr, episode_fanart, **item_data)
+        else:
+            CheckAutoplay(**item_data)
+        # BBC-010: END custom AddMenuEntry
 
 
 def RemoveWatching(episode_id):

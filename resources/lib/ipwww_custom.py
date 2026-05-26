@@ -212,8 +212,148 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
     if debug == True:
         log_message('create_af3_style_episode_header: Format 1/2/3 output = ' + af3_episode_header_colour)
 
-    return af3_episode_header_colour 
+    return af3_episode_header_colour
+
+# BBC-010: START def get_episode_data
+def get_episode_data(subtitle, title, debug, itemtype):
+    """
+    Creates an AF3 style "Episode Header" from different iPlayer episode "subtitle" formats
     
+    Ref.        Input subtitle Format     Input Title Format   Output Format           Watching    Recommendations  Highlights
+    ----        ---------------------     ------------------   -------------           --------    ---------------  ----------
+    Format 1    Series N: NN. EpisodeTitle                     NxNN. EpisodeTitle          Yes             Yes
+    Format 2    Series N: London                               Nx00. EpisodeTitle          Yes
+    Format 3    Series N: Episode N                            NxNN. Episode N                             Yes
+    Format 4    Episode N                                      1xNN. Episode N             Yes
+    Format 5    N. EpisodeTitle                                1xNN. EpisodeTitle                          Yes
+    Format 5.1  Text: N. EpisodeTitle                          1xNN. EpisodeTitle                                       Yes
+    Format 5.2  Text                                           Text                                                     Yes
+    Format 6    None                      ShowTitle            1x01. ShowTitle                             Yes
+    Format 7    MovieTitle or tagline     MovieTitle           MovieTitle or tagline       Yes             Yes
+    """
+    
+    color_white = "[COLOR white]"
+    color_end = "[/COLOR]"
+    
+    isEpisode = False
+    
+    if debug == True:
+        log_message('get_episode_data: subtitle = ' + str(subtitle))
+        log_message('get_episode_data: title = ' + str(title))
+   
+    # process Format 7
+    if itemtype == 'movie':
+        if debug == True:
+            log_message('get_episode_data: Processing Format 7 for title = ' + title)        
+        return isEpisode, "", "", ""    
+    
+    # process Format 6
+    if subtitle == 'None':
+        if debug == True:
+            log_message('get_episode_data: Processing Format 6 for subtitle = ' + subtitle)
+        return isEpisode, "", "", ""               
+   
+    # process Format 4
+    if subtitle.startswith("Episode"):
+        if debug == True:
+            log_message('get_episode_data: Processing Format 4 for subtitle = ' + subtitle)
+        series_nr = "1"
+        episode_1 = subtitle.replace('Episode ','')
+        if len(episode_1) == 1:
+            episode_nr = '0' + episode_1
+        else:
+            episode_nr = episode_1           
+        af3_episode_header = "[B]" + series_nr + 'x' + episode_nr + '. ' + 'Episode ' + episode_1 + "[/B][CR]"
+        af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+        if debug == True:
+            log_message('get_episode_data: Format 4 output = ' + af3_episode_header_colour)            
+        return isEpisode, "", "", ""   
+        
+    # process Format 5
+    if "Series" not in subtitle and subtitle != 'None':
+        if debug == True:
+            log_message('get_episode_data: Processing Format 5 for subtitle = ' + subtitle)
+
+        positionofcolon = subtitle.find(':') # Format 5.1
+        if positionofcolon > 0:
+            af3_episode_header = "[B]" + subtitle + "[/B][CR]"
+            af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+            if debug == True:
+                log_message('get_episode_data: Format 5.1 output = ' + af3_episode_header_colour)         
+            return isEpisode, '', '', ''
+        
+        positionofperiod = subtitle.find('.')
+        episode_1 = subtitle[:positionofperiod]        
+        countofslash = subtitle.count('/') # subtitle probably a date 
+
+        if positionofperiod == -1 and countofslash < 2: # Format 5.2
+            af3_episode_header = "[B]" + subtitle + "[/B][CR]"
+            af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+            if debug == True:
+                log_message('get_episode_data: Format 5.2 output = ' + af3_episode_header_colour)         
+            return isEpisode, '', '', ''
+                
+        series_nr = '1'
+        
+        if countofslash == 2: # subtitle probably a date
+            episode_nr = '00'
+            episode_title = subtitle            
+        elif positionofperiod == 1:
+            episode_nr = '0' + episode_1
+        else:
+            episode_nr = episode_1
+        episode_title = subtitle[positionofperiod + 2:]
+        af3_episode_header = "[B]" + series_nr + "x" + episode_nr + ". " + episode_title + "[/B][CR]"
+        af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+        if debug == True:
+            log_message('get_episode_data: Format 5 output = ' + af3_episode_header_colour)         
+        return isEpisode, "", "", ""   
+    
+    # debug message for Formats 1 2 and 3
+    if debug == True:
+        log_message('get_episode_data: Processing Formats  1 2 and 3 for subtitle = ' + subtitle)
+        
+    # reformat subtitle if input is Format 3
+    index = subtitle.find('Episode') # returns -1 if not found
+    if index > 1:
+        if debug == True:
+            log_message('get_episode_data: Processing Format 3 for subtitle = ' + subtitle)
+        d0 = strip_before(subtitle,'Episode')
+        d1 = subtitle.replace('Episode ','')
+        d2 = d1 + '.'
+        subtitle = d2 + ' ' + d0
+    
+    # get series number
+    t1 = subtitle[7:] # remove "Series " from start of description
+    series_nr = strip_after(t1,":")
+    
+    # get episode number
+    t2 = t1.find(" ")
+    t3 = t1[t2+1:]
+    t4 = strip_after(t3,".")
+    try: # obtain episode number if possible, otherwise set to 0
+        episode_nr = int(t4)
+        if debug == True:
+            log_message('get_episode_data: Processing Formats 1 and 3 for subtitle = ' + subtitle)
+    except Exception: # Format 2
+        episode_nr = 0
+        if debug == True:
+            log_message('get_episode_data: Processing Format 2 for subtitle = ' + subtitle)
+    episode_nr_pad = f"{episode_nr:02d}"
+    episode_nr_pad_str = str(episode_nr_pad)
+    
+    # get episode title
+    t5 = strip_before(t1,".")
+    episode_title = t5[2:]
+    
+    # create AF3 style episode header
+    af3_episode_header = "[B]" + str(series_nr) + "x" + episode_nr_pad_str + ". " + episode_title + "[/B][CR]" 
+    af3_episode_header_colour = f"{color_white}{af3_episode_header}{color_end}"
+    if debug == True:
+        log_message('get_episode_data: Format 1/2/3 output = ' + af3_episode_header_colour)
+    isEpisode = True
+    return isEpisode, episode_title, str(series_nr), episode_nr_pad_str    
+# BBC-010: END def get_episode_data    
     
 def custom_select_image(images):
     if not images:
@@ -225,4 +365,5 @@ def custom_select_image(images):
            or images.get('default') # Recommendations
            or images.get('portrait')
            or 'DefaultFolder.png').replace('{recipe}', '832x468') 
-    
+
+ 
