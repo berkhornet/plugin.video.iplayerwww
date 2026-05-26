@@ -44,6 +44,9 @@ from .ipwww_custom import strip_after
 from .ipwww_custom import create_af3_style_episode_header
 from .ipwww_custom import custom_select_image
 from .ipwww_custom import get_episode_data
+import requests
+from .ipwww_custom import get_episode_plot
+from .ipwww_custom import get_tmdb_id_for_show
 # BBC-004: END import custom functions
 
 # BBC-010: START def CheckAutoplay_episode            
@@ -1278,7 +1281,16 @@ def ListWatching():
         item_data['name'] = episode_title
         item_data['description'] = "No plot information available."        
         # BBC-010: END extract episode title, season number and episode number from episode data
-        
+         
+        if isEpisode == True:
+            tmdb_id = get_tmdb_id_for_show(episode['title'])
+            if tmdb_id == None:
+                item_data['description'] = "No plot information available."        
+            else:                
+                tmdb_episode_plot = get_episode_plot(tmdb_id, int(season_nr), int(episode_nr))
+                item_data['description'] = tmdb_episode_plot
+
+ 
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
             total_seconds = int(remaining_seconds * 100 / (100 - watching_item.get('progress', 0)))

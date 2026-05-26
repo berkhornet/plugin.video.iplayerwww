@@ -66,7 +66,19 @@ def strip_after(text: str, marker: str) -> str:
     index = text.find(marker)
     if index != -1:
         return text[:index]  # Keep everything before marker
-    return text  # Marker not found, return original       
+    return text  # Marker not found, return original
+
+
+def custom_select_image(images):
+    if not images:
+        return 'DefaultFolder.png'
+    return(images.get('promotional_with_logo')
+           or images.get('promotionalWithLogo') # Recommendations
+           or images.get('promotional')
+           or images.get('standard')
+           or images.get('default') # Recommendations
+           or images.get('portrait')
+           or 'DefaultFolder.png').replace('{recipe}', '832x468') 
 
 
 def create_af3_style_episode_header(subtitle, title, debug, itemtype):
@@ -353,17 +365,87 @@ def get_episode_data(subtitle, title, debug, itemtype):
         log_message('get_episode_data: Format 1/2/3 output = ' + af3_episode_header_colour)
     isEpisode = True
     return isEpisode, episode_title, str(series_nr), episode_nr_pad_str    
-# BBC-010: END def get_episode_data    
+# BBC-010: END def get_episode_data
     
-def custom_select_image(images):
-    if not images:
-        return 'DefaultFolder.png'
-    return(images.get('promotional_with_logo')
-           or images.get('promotionalWithLogo') # Recommendations
-           or images.get('promotional')
-           or images.get('standard')
-           or images.get('default') # Recommendations
-           or images.get('portrait')
-           or 'DefaultFolder.png').replace('{recipe}', '832x468') 
+    
+# BBC-010: START functions to get episode plot via TMDb API
+def get_tmdb_id_for_show(show_name):
+    """
+    Search TMDb for a TV show and return its TMDb ID.
+    """
+    TMDB_API_KEY = "e92d7c9d19df047c576ee8724f174e07"
 
- 
+    if not show_name.strip():
+        raise ValueError("Show name cannot be empty.")
+
+    url = "https://api.themoviedb.org/3/search/tv"
+    params = {
+        "api_key": TMDB_API_KEY,
+        "query": show_name,
+        "language": "en-US",
+        "page": 1
+    }
+
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+
+        results = data.get("results", [])
+        if not results:
+            log_message('get_tmdb_id_for_show: No results found for ' + show_name)
+            return None
+
+        # Take the first match
+        first_result = results[0]
+        tmdb_id = first_result.get("id")
+        name = first_result.get("name")
+        first_air_date = first_result.get("first_air_date", "Unknown")
+        log_message('get_tmdb_id_for_show: show: ' + name + ' first air date: ' + str(first_air_date) + ' TMDb ID: ' + str(tmdb_id))
+        return tmdb_id
+
+    except requests.exceptions.RequestException as e:
+        print(f"Network/API error: {e}")
+        return None
+    except ValueError as ve:
+        print(f"Value error: {ve}")
+        return None
+        
+        
+def get_episode_plot(tv_id, season_number, episode_number):
+    """
+    Fetches the plot (overview) of a specific TV episode from TMDB.
+    
+    Args:
+        tv_id (int): TMDB TV show ID.
+        season_number (int): Season number.
+        episode_number (int): Episode number.
+    
+    Returns:
+        str: Episode plot or an error message.
+    """
+    
+    API_KEY = "e92d7c9d19df047c576ee8724f174e07"  # Replace with your TMDB API key
+    BASE_URL = "https://api.themoviedb.org/3"
+    
+    url = f"{BASE_URL}/tv/{tv_id}/season/{season_number}/episode/{episode_number}"
+    params = {"api_key": API_KEY, "language": "en-US"}
+
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()  # Raise HTTPError for bad responses
+        data = response.json()
+
+        # Check if overview exists
+        overview = data.get("overview", "").strip()
+        if not overview:
+            return "No plot available for this episode."
+        return overview
+
+    except requests.exceptions.HTTPError as http_err:
+        return f"HTTP error occurred: {http_err}"
+    except requests.exceptions.RequestException as req_err:
+        return f"Request error occurred: {req_err}"
+    except Exception as e:
+        return f"Unexpected error: {e}"
+# BBC-010: END functions to get episode plot via TMDb API
