@@ -625,6 +625,7 @@ def AddMenuEntry_ListWatching(show_title, episode_title, season, episode, episod
         info_tag.setTagLine(movie_info['tagline'])
         info_tag.setMediaType("movie")
         info_tag.setDuration(int(total_time))
+        #listitem.setArt({'fanart': iconimage}) # don't know why this is needed
           
     else:
         info_tag.setTitle(name)
@@ -644,7 +645,7 @@ def AddMenuEntry_ListWatching(show_title, episode_title, season, episode, episod
 
     video_streaminfo = {'codec': 'h264'}
     if not isFolder:
-        listitem.setPath(url)
+        info_tag.setPath(url)
         listitem.setProperty('inputstream', 'inputstream.adaptive')
         listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
 
