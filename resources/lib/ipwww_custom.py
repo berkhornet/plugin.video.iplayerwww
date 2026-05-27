@@ -440,26 +440,97 @@ def get_episode_plot(tv_id, season_number, episode_number):
         return f"Request error occurred: {req_err}"
     except Exception as e:
         return f"Unexpected error: {e}"
-        
 
-def get_movie_details(tmdb_id):
-    
+
+def get_episode_info(tv_id, season_number, episode_number, language="en-US"):
+
     """
-    Fetch movie details (plot and tagline) from TMDb using the movie's TMDb ID.
+    Fetch episode details from TMDb API.
+
+    :param api_key: Your TMDb API key (string)
+    :param tv_id: TMDb TV show ID (int or string)
+    :param season_number: Season number (int or string)
+    :param episode_number: Episode number (int or string)
+    :param language: Language code (default: "en-US")
+    :return: dict with episode details or dict with error info
     """
-    
-    api_key = "e92d7c9d19df047c576ee8724f174e07"
-    url = f"https://api.themoviedb.org/3/movie/{tmdb_id}?api_key={api_key}&language=en-US"
+    url = f"https://api.themoviedb.org/3/tv/{tv_id}/season/{season_number}/episode/{episode_number}"
+    params = {
+        "api_key": 'e92d7c9d19df047c576ee8724f174e07',
+        "language": language
+    }
+
     try:
-        response = requests.get(url)
+        response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
         data = response.json()
-        movie_title = data.get("title", "Unknown Title")
-        plot = data.get("overview", "No plot available")
-        tagline = data.get("tagline", "No tagline available")
-        return plot, tagline
+
+        # TMDb error handling
+        if "status_code" in data and data["status_code"] != 1:
+            return {"error": data.get("status_message", "Unknown error")}
+
+        # Return structured episode info
+        return {
+            "title": data.get("name"),
+            "air_date": data.get("air_date"),
+            "episode_number": data.get("episode_number"),
+            "season_number": data.get("season_number"),
+            "overview": data.get("overview"),
+            "vote_average": data.get("vote_average"),
+            "vote_count": data.get("vote_count")
+        }
+
     except requests.exceptions.RequestException as e:
-        return {"error": f"Failed to fetch movie details: {e}"}        
+        return {"error": f"Network or request error: {e}"}
+    except ValueError:
+        return {"error": "Error parsing JSON response."}       
+
+
+def get_movie_info(movie_id):
+
+    """
+    Fetch movie details from TMDB API by movie ID.
+    """
+    API_KEY = "e92d7c9d19df047c576ee8724f174e07"  # Replace with your TMDB API key
+    BASE_URL = "https://api.themoviedb.org/3"
+    
+    try:
+        # Build the request URL
+        url = f"{BASE_URL}/movie/{movie_id}"
+        params = {
+            "api_key": API_KEY,
+            "language": "en-US"
+        }
+
+        # Send GET request
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()  # Raise HTTPError for bad responses
+
+        # Parse JSON response
+        data = response.json()
+
+        # Extract relevant fields safely
+        movie_info = {
+            "title": data.get("title"),
+            "tagline": data.get("tagline"),
+            "release_date": data.get("release_date"),
+            "runtime": data.get("runtime"),
+            "genres": [g["name"] for g in data.get("genres", [])],
+            "overview": data.get("overview"),
+            "poster_url": f"https://image.tmdb.org/t/p/w500{data['poster_path']}" if data.get("poster_path") else None
+        }
+
+        return movie_info
+
+    except requests.exceptions.RequestException as e:
+        print(f"Network error: {e}")
+    except ValueError:
+        print("Error parsing JSON response.")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+
+    return None
+        
 # BBC-010: END functions to get episode plot via TMDb API
 
 # BBC-010: START def of CheckAutoplay_ListWatching and AddMenuEntry_ListWatching
@@ -479,11 +550,9 @@ def AddMenuEntry_ListWatching(show_title, episode_title, season, episode, episod
     """Adds a new line to the Kodi list of playables.
     It is used in multiple ways in the plugin, which are distinguished by modes.
     """
-    from .ipwww_custom import get_episode_plot
-    from .ipwww_custom import get_movie_details
-    from .ipwww_custom import search_tmdb
-    from .ipwww_common import utf8_quote_plus
 
+    from .ipwww_common import utf8_quote_plus
+    
     # START get data from TMDb
     tmdb_id, tmdb_type = search_tmdb('tv', show_title) # try to get tmdb_id for tvshow
     if tmdb_id == None:
@@ -491,9 +560,9 @@ def AddMenuEntry_ListWatching(show_title, episode_title, season, episode, episod
         if tmdb_id == None:
             description = "Movie: No plot information available."        
         else: 
-            description, movie_tagline = get_movie_details(tmdb_id) # get plot for movie using tmdb_id          
+            movie_info = get_movie_info(tmdb_id) # get plot for movie using tmdb_id          
     else: # we have tvshow tmdb_id              
-        description  = get_episode_plot(tmdb_id, int(season), int(episode))  # get plot for tvshow using tmdb_id     
+        episode_info = get_episode_info(tmdb_id, int(season), int(episode))  # get plot for tvshow using tmdb_id     
     # END get data from TMDb
         
     if not iconimage:
@@ -541,17 +610,24 @@ def AddMenuEntry_ListWatching(show_title, episode_title, season, episode, episod
             "season": season,
             "episode": episode,
             "title": episode_title,
+            "plot": episode_info['overview'],
+            "plotoutline": episode_info['overview'],
+            "premiered": episode_info['air_date'],
+            "mediatype" : "episode"})
+    elif tmdb_type == 'movie':       
+        listitem.setInfo("video", {
+            "title": show_title,
+            "plot": movie_info['overview'],
+            "plotoutline": movie_info['overview'],
+            "premiered": movie_info['release_date'],
+            "tagline": movie_info['tagline'],
+            "mediatype" : "movie"})
+    else:
+        listitem.setInfo("video", {
+            "title": name,
             "plot": description,
             "plotoutline": description,
-            "mediatype" : "episode"})
-    else:        
-        if tmdb_type == 'movie':
-            listitem.setInfo("video", {
-                "title": show_title,
-                "plot": description,
-                "plotoutline": description,
-                "tagline": movie_tagline,
-                "mediatype" : "movie"})
+            "mediatype" : "video"})
     
     if aired:
         listitem.setInfo("video", {
