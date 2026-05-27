@@ -552,7 +552,7 @@ def AddMenuEntry_ListWatching(show_title, episode_title, season, episode, episod
     """
 
     from .ipwww_common import utf8_quote_plus
-    
+        
     # START get data from TMDb
     tmdb_id, tmdb_type = search_tmdb('tv', show_title) # try to get tmdb_id for tvshow
     if tmdb_id == None:
@@ -600,43 +600,44 @@ def AddMenuEntry_ListWatching(show_title, episode_title, season, episode, episod
         isFolder = True
 
     listitem = xbmcgui.ListItem(label=name, label2=description)
+
+    info_tag = listitem.getVideoInfoTag()
     
     listitem.setArt({'icon':'DefaultFolder.png', 'thumb':iconimage})
     listitem.setArt({'fanart': ''})
-
-    if tmdb_type == 'tvshow':
-        listitem.setInfo("video", {
-            "tvshowtitle": show_title,
-            "season": season,
-            "episode": episode,
-            "title": episode_title,
-            "plot": episode_info['overview'],
-            "plotoutline": episode_info['overview'],
-            "premiered": episode_info['air_date'],
-            "mediatype" : "episode"})
-    elif tmdb_type == 'movie':       
-        listitem.setInfo("video", {
-            "title": show_title,
-            "plot": movie_info['overview'],
-            "plotoutline": movie_info['overview'],
-            "premiered": movie_info['release_date'],
-            "tagline": movie_info['tagline'],
-            "mediatype" : "movie"})
-    else:
-        listitem.setInfo("video", {
-            "title": name,
-            "plot": description,
-            "plotoutline": description,
-            "mediatype" : "video"})
     
-    if aired:
-        listitem.setInfo("video", {
-            "date": date_string,
-            "aired": aired})        
+    if tmdb_type == 'tvshow':
+        info_tag.setTvShowTitle(show_title)
+        info_tag.setSeason(int(season))
+        info_tag.setEpisode(int(episode))
+        info_tag.setTitle(episode_title)
+        info_tag.setPlot(episode_info['overview'])
+        info_tag.setPlotOutline(episode_info['overview'])
+        info_tag.setPremiered(episode_info['air_date'])
+        info_tag.setMediaType("episode")
+        info_tag.setDuration(int(total_time)) 
+        
+    elif tmdb_type == 'movie':
+        info_tag.setTitle(show_title)
+        info_tag.setPlot(movie_info['overview'])
+        info_tag.setPlotOutline(movie_info['overview'])
+        info_tag.setPremiered(movie_info['release_date'])
+        info_tag.setTagLine(movie_info['tagline'])
+        info_tag.setMediaType("movie")
+        info_tag.setDuration(int(total_time))
+          
+    else:
+        info_tag.setTitle(name)
+        info_tag.setPlot(description)
+        info_tag.setPlotOutline(description)
+        info_tag.setMediaType("video") 
+        info_tag.setDuration(int(total_time))    
+        if aired:
+            info_tag.setPremiered(aired)
+            info_tag.setDate(date_string)      
 
     if resume_time:
-        listitem.setProperty('ResumeTime', resume_time)
-        listitem.setProperty('TotalTime', total_time if total_time else '7200')
+        info_tag.setResumePoint(float(resume_time), float(total_time))
 
     if context_mnu:
         listitem.addContextMenuItems(context_mnu)
