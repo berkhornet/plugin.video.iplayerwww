@@ -15,7 +15,7 @@ from operator import itemgetter
 from resources.lib.ipwww_common import (
     translation, AddMenuEntry, OpenURL, OpenRequest, CheckLogin, CreateBaseDirectory,
     GetCookieJar, ParseImageUrl, download_subtitles, GeoBlockedError, WebRequestError,
-    iso_duration_2_seconds, PostJson, strptime, addonid, DeleteUrl, ProgressDlg, AddMenuEntry_ListWatching)
+    iso_duration_2_seconds, PostJson, strptime, addonid, DeleteUrl, ProgressDlg)
 from resources.lib import ipwww_progress
 
 import xbmc
@@ -44,19 +44,11 @@ from .ipwww_custom import strip_after
 from .ipwww_custom import create_af3_style_episode_header
 from .ipwww_custom import custom_select_image
 from .ipwww_custom import get_episode_data
-import requests
-# BBC-004: END import custom functions
+from .ipwww_custom import AddMenuEntry_ListWatching
+from .ipwww_custom import CheckAutoplay_ListWatching
 
-# BBC-010: START def CheckAutoplay_episode            
-def CheckAutoplay_ListWatching(showtitle, episode_title, season, episode, episode_fanart, name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
-    if ADDON.getSetting('streams_autoplay') == 'true':
-        mode = 202
-    else:
-        mode = 122
-    AddMenuEntry_ListWatching(showtitle, episode_title, season, episode, episode_fanart, name, url, mode, iconimage, description, '', aired=aired,
-                 resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)
-# BBC-010: END def CheckAutoplay_episode
-            
+import requests
+# BBC-004: END import custom functions       
 
 def tp(path):
     return xbmcvfs.translatePath(path)

@@ -370,7 +370,6 @@ def get_episode_data(subtitle, title, debug, itemtype):
     
     
 # BBC-010: START functions to get episode plot via TMDb API
- #def get_tmdb_id_for_show(show_name):
 def search_tmdb(category, name):
     
     """
@@ -443,52 +442,6 @@ def get_episode_plot(tv_id, season_number, episode_number):
         return f"Unexpected error: {e}"
         
 
-def get_movie_plot(tmdb_id):
-    
-    """
-    Fetches the movie plot (overview) from TMDb using the movie's TMDb ID.
-
-    Args:
-        tmdb_id (int): The TMDb movie ID.
-        api_key (str): Your TMDb API key.
-
-    Returns:
-        str: The movie plot if found, otherwise an error message.
-    """
-    
-    api_key = "e92d7c9d19df047c576ee8724f174e07"  # Replace with your TMDB API key
-    
-    if not isinstance(tmdb_id, int) or tmdb_id <= 0:
-        return "Error: tmdb_id must be a positive integer."
-
-    if not api_key or not isinstance(api_key, str):
-        return "Error: A valid TMDb API key is required."
-
-    url = f"https://api.themoviedb.org/3/movie/{tmdb_id}"
-    params = {
-        "api_key": api_key,
-        "language": "en-US"
-    }
-
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()  # Raise HTTPError for bad responses
-        data = response.json()
-
-        # Check if 'overview' exists
-        plot = data.get("overview")
-        if plot:
-            return plot.strip()
-        else:
-            return "No plot available for this movie."
-
-    except requests.exceptions.HTTPError as http_err:
-        return f"HTTP error occurred: {http_err}"
-    except requests.exceptions.RequestException as req_err:
-        return f"Request error occurred: {req_err}"
-    except ValueError:
-        return "Error parsing the response."
-
 def get_movie_details(tmdb_id):
     
     """
@@ -508,3 +461,125 @@ def get_movie_details(tmdb_id):
     except requests.exceptions.RequestException as e:
         return {"error": f"Failed to fetch movie details: {e}"}        
 # BBC-010: END functions to get episode plot via TMDb API
+
+# BBC-010: START def of CheckAutoplay_ListWatching and AddMenuEntry_ListWatching
+def CheckAutoplay_ListWatching(showtitle, episode_title, season, episode, episode_fanart, name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
+    ADDON = xbmcaddon.Addon(id='plugin.video.iplayerwww')
+    if ADDON.getSetting('streams_autoplay') == 'true':
+        mode = 202
+    else:
+        mode = 122
+    AddMenuEntry_ListWatching(showtitle, episode_title, season, episode, episode_fanart, name, url, mode, iconimage, description, '', aired=aired,
+                 resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)
+
+
+def AddMenuEntry_ListWatching(show_title, episode_title, season, episode, episode_fanart, name, url, mode, iconimage, description='', subtitles_url='', aired=None, resolution=None,
+                 resume_time='', total_time='', episode_id='', stream_id='', context_mnu=None, replay_chan_id=''):
+    
+    """Adds a new line to the Kodi list of playables.
+    It is used in multiple ways in the plugin, which are distinguished by modes.
+    """
+    from .ipwww_custom import get_episode_plot
+    from .ipwww_custom import get_movie_details
+    from .ipwww_custom import search_tmdb
+    from .ipwww_common import utf8_quote_plus
+
+    # START get data from TMDb
+    tmdb_id, tmdb_type = search_tmdb('tv', show_title) # try to get tmdb_id for tvshow
+    if tmdb_id == None:
+        tmdb_id, tmdb_type = search_tmdb('movie', show_title)  # if not found try to get tmdb_id for tvshow
+        if tmdb_id == None:
+            description = "Movie: No plot information available."        
+        else: 
+            description, movie_tagline = get_movie_details(tmdb_id) # get plot for movie using tmdb_id          
+    else: # we have tvshow tmdb_id              
+        description  = get_episode_plot(tmdb_id, int(season), int(episode))  # get plot for tvshow using tmdb_id     
+    # END get data from TMDb
+        
+    if not iconimage:
+        # BBC-001: Use iPlayer artwork 
+        # iconimage="DefaultFolder.png"
+        iconimage=fanartpath
+    listitem_url = ''.join((
+        sys.argv[0],
+        "?url=", utf8_quote_plus(url),
+        "&mode=", str(mode),
+        "&name=", utf8_quote_plus(name),
+        "&iconimage=", utf8_quote_plus(iconimage),
+        "&description=", utf8_quote_plus(description),
+        "&subtitles_url=", utf8_quote_plus(subtitles_url),
+        "&episode_id=", utf8_quote_plus(episode_id),
+        "&stream_id=", utf8_quote_plus(stream_id),
+        "&resume_time=", resume_time,
+        "&total_time=", total_time,
+        "&replay_chan_id=", replay_chan_id))
+    if mode in (101,203,113,213):
+        listitem_url = listitem_url + "&time=" + str(time.time())
+    if aired:
+        ymd = aired.split('-')
+        date_string = ymd[2] + '/' + ymd[1] + '/' + ymd[0]
+    else:
+        date_string = ""
+
+    # Modes 201-299 will create a new playable line, otherwise create a new directory line.
+    if mode in (201, 202, 203, 204, 205, 211, 212, 213, 214):
+        isFolder = False
+    # Mode 119 is not a folder, but it is also not a playable.
+    elif mode == 119:
+        isFolder = False
+    else:
+        isFolder = True
+
+    listitem = xbmcgui.ListItem(label=name, label2=description)
+    
+    listitem.setArt({'icon':'DefaultFolder.png', 'thumb':iconimage})
+    listitem.setArt({'fanart': ''})
+
+    if tmdb_type == 'tvshow':
+        listitem.setInfo("video", {
+            "tvshowtitle": show_title,
+            "season": season,
+            "episode": episode,
+            "title": episode_title,
+            "plot": description,
+            "plotoutline": description,
+            "mediatype" : "episode"})
+    else:        
+        if tmdb_type == 'movie':
+            listitem.setInfo("video", {
+                "title": show_title,
+                "plot": description,
+                "plotoutline": description,
+                "tagline": movie_tagline,
+                "mediatype" : "movie"})
+    
+    if aired:
+        listitem.setInfo("video", {
+            "date": date_string,
+            "aired": aired})        
+
+    if resume_time:
+        listitem.setProperty('ResumeTime', resume_time)
+        listitem.setProperty('TotalTime', total_time if total_time else '7200')
+
+    if context_mnu:
+        listitem.addContextMenuItems(context_mnu)
+
+    video_streaminfo = {'codec': 'h264'}
+    if not isFolder:
+        listitem.setPath(url)
+        listitem.setProperty('inputstream', 'inputstream.adaptive')
+        listitem.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+
+    # Mode 119 is not a folder, but it is also not a playable.
+    if mode == 119:
+        listitem.setProperty("IsPlayable", 'false')
+    else:
+        listitem.setProperty("IsPlayable", str(not isFolder).lower())
+    listitem.setProperty("IsFolder", str(isFolder).lower())
+    listitem.setProperty("Property(Addon.Name)", "iPlayer WWW")
+    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
+                                url=listitem_url, listitem=listitem, isFolder=isFolder)
+
+    return True     
+# BBC-010: END def of CheckAutoplay_ListWatching and AddMenuEntry_ListWatching
