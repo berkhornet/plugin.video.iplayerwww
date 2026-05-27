@@ -15,7 +15,7 @@ from operator import itemgetter
 from resources.lib.ipwww_common import (
     translation, AddMenuEntry, OpenURL, OpenRequest, CheckLogin, CreateBaseDirectory,
     GetCookieJar, ParseImageUrl, download_subtitles, GeoBlockedError, WebRequestError,
-    iso_duration_2_seconds, PostJson, strptime, addonid, DeleteUrl, ProgressDlg, AddMenuEntry_episode)
+    iso_duration_2_seconds, PostJson, strptime, addonid, DeleteUrl, ProgressDlg, AddMenuEntry_ListWatching)
 from resources.lib import ipwww_progress
 
 import xbmc
@@ -45,19 +45,15 @@ from .ipwww_custom import create_af3_style_episode_header
 from .ipwww_custom import custom_select_image
 from .ipwww_custom import get_episode_data
 import requests
-from .ipwww_custom import get_episode_plot
-from .ipwww_custom import get_movie_plot
-#from .ipwww_custom import get_tmdb_id_for_show
-from .ipwww_custom import search_tmdb
 # BBC-004: END import custom functions
 
 # BBC-010: START def CheckAutoplay_episode            
-def CheckAutoplay_episode(showtitle, episode_title, season, episode, episode_fanart, name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
+def CheckAutoplay_ListWatching(showtitle, episode_title, season, episode, episode_fanart, name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
     if ADDON.getSetting('streams_autoplay') == 'true':
         mode = 202
     else:
         mode = 122
-    AddMenuEntry_episode(showtitle, episode_title, season, episode, episode_fanart, name, url, mode, iconimage, description, '', aired=aired,
+    AddMenuEntry_ListWatching(showtitle, episode_title, season, episode, episode_fanart, name, url, mode, iconimage, description, '', aired=aired,
                  resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)
 # BBC-010: END def CheckAutoplay_episode
             
@@ -1258,7 +1254,7 @@ def ListWatching():
         if debug == True:
             log_message('ListWatching: episode = ' + str(episode))
             log_message('ListWatching: programme = ' + str(programme))
-            log_message('ListWatching: item_data = ' + str(item_data))
+            log_message('ListWatching: item_data = ' + str(item_data))          
         # BBC-008: END debug
             
         # BBC-007: START use image with logo            
@@ -1280,22 +1276,11 @@ def ListWatching():
         item_data['description'] = "No plot information available."        
         # BBC-010: END extract episode title, season number and episode number from episode data
          
-        # BBC-010: START get plot from TMDb if possible 
-
         # Lacking a field synopses, a watching item's description is empty. Since the
         # remaining playtime is presented in the title instead of the usual episode name,
         # place the original title/sub-title in the description.
         
-        tmdb_id, tmdb_type = search_tmdb('tv', episode['title']) # try to get tmdb_id for tvshow
-        if tmdb_id == None:
-            tmdb_id, tmdb_type = search_tmdb('movie', episode['title'])  # if not found try to get tmdb_id for tvshow
-            if tmdb_id == None:
-                item_data['description'] = "Movie: No plot information available."        
-            else: 
-                item_data['description'] = get_movie_plot(tmdb_id) # get plot for movie using tmdb_id          
-        else: # we have tvshow tmdb_id              
-            item_data['description']  = get_episode_plot(tmdb_id, int(season_nr), int(episode_nr))  # get plot for tvshow using tmdb_id   
-        # BBC-010: END get plot from TMDb if possible      
+        # BBC-010: Plot will be obtained from TMDb by CheckAutoplay_ListWatching    
 
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
@@ -1329,7 +1314,7 @@ def ListWatching():
         episode_fanart = episode['images']['standard'].replace('{recipe}', '832x468')
         if isEpisode == True:
             show_title = episode['title']
-            CheckAutoplay_episode(show_title, episode_title, season_nr, episode_nr, episode_fanart, **item_data)
+            CheckAutoplay_ListWatching(show_title, episode_title, season_nr, episode_nr, episode_fanart, **item_data)
         else:
             CheckAutoplay(**item_data)
         # BBC-010: END custom AddMenuEntry

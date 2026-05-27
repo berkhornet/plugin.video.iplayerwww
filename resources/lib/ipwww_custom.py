@@ -256,8 +256,9 @@ def get_episode_data(subtitle, title, debug, itemtype):
     # process Format 7
     if itemtype == 'movie':
         if debug == True:
-            log_message('get_episode_data: Processing Format 7 for title = ' + title)        
-        return isEpisode, "", "", ""    
+            log_message('get_episode_data: Processing Format 7 for title = ' + title) 
+        isEpisode = True            
+        return isEpisode, subtitle, "", ""    
     
     # process Format 6
     if subtitle == 'None':
@@ -486,5 +487,24 @@ def get_movie_plot(tmdb_id):
     except requests.exceptions.RequestException as req_err:
         return f"Request error occurred: {req_err}"
     except ValueError:
-        return "Error parsing the response."        
+        return "Error parsing the response."
+
+def get_movie_details(tmdb_id):
+    
+    """
+    Fetch movie details (plot and tagline) from TMDb using the movie's TMDb ID.
+    """
+    
+    api_key = "e92d7c9d19df047c576ee8724f174e07"
+    url = f"https://api.themoviedb.org/3/movie/{tmdb_id}?api_key={api_key}&language=en-US"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        movie_title = data.get("title", "Unknown Title")
+        plot = data.get("overview", "No plot available")
+        tagline = data.get("tagline", "No tagline available")
+        return plot, tagline
+    except requests.exceptions.RequestException as e:
+        return {"error": f"Failed to fetch movie details: {e}"}        
 # BBC-010: END functions to get episode plot via TMDb API

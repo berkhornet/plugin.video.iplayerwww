@@ -19,7 +19,6 @@ import xbmcvfs
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
-
 try:
     import cookielib
 except:
@@ -620,12 +619,28 @@ def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', a
     return True
 
 # BBC-010: START def AddMenuEntry_episode
-def AddMenuEntry_episode(show_title, episode_title, season, episode, episode_fanart, name, url, mode, iconimage, description='', subtitles_url='', aired=None, resolution=None,
+def AddMenuEntry_ListWatching(show_title, episode_title, season, episode, episode_fanart, name, url, mode, iconimage, description='', subtitles_url='', aired=None, resolution=None,
                  resume_time='', total_time='', episode_id='', stream_id='', context_mnu=None, replay_chan_id=''):
+    
     """Adds a new line to the Kodi list of playables.
     It is used in multiple ways in the plugin, which are distinguished by modes.
     """
-
+    from .ipwww_custom import get_episode_plot
+    from .ipwww_custom import get_movie_details
+    from .ipwww_custom import search_tmdb
+    
+    tmdb_id, tmdb_type = search_tmdb('tv', show_title) # try to get tmdb_id for tvshow
+    if tmdb_id == None:
+        tmdb_id, tmdb_type = search_tmdb('movie', show_title)  # if not found try to get tmdb_id for tvshow
+        if tmdb_id == None:
+            description = "Movie: No plot information available."        
+        else: 
+            description, movie_tagline = get_movie_details(tmdb_id) # get plot for movie using tmdb_id          
+    else: # we have tvshow tmdb_id              
+        description  = get_episode_plot(tmdb_id, int(season), int(episode))  # get plot for tvshow using tmdb_id     
+    
+    log_message('mode = ' + str(mode))
+    
     if not iconimage:
         # BBC-001: Use iPlayer artwork 
         # iconimage="DefaultFolder.png"
@@ -665,14 +680,23 @@ def AddMenuEntry_episode(show_title, episode_title, season, episode, episode_fan
     listitem.setArt({'icon':'DefaultFolder.png', 'thumb':iconimage})
     listitem.setArt({'fanart': ''})
 
-    listitem.setInfo("video", {
-        "tvshowtitle": show_title,
-        "season": season,
-        "episode": episode,
-        "title": episode_title,
-        "plot": description,
-        "plotoutline": description,
-        "mediatype" : "episode"})
+    if tmdb_type == 'tvshow':
+        listitem.setInfo("video", {
+            "tvshowtitle": show_title,
+            "season": season,
+            "episode": episode,
+            "title": episode_title,
+            "plot": description,
+            "plotoutline": description,
+            "mediatype" : "episode"})
+    else:        
+        if tmdb_type == 'movie':
+            listitem.setInfo("video", {
+                "title": show_title,
+                "plot": description,
+                "plotoutline": description,
+                "tagline": movie_tagline,
+                "mediatype" : "movie"})
     
     if aired:
         listitem.setInfo("video", {
