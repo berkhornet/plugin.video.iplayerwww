@@ -1022,7 +1022,12 @@ def ParseProgramme(progr_data, playable=False):
             # 'name': '[B]{}[/B] - {} episodes available'.format(progr_data['title'], progr_data['count'])
             'name': '{}'.format(progr_data['title'])
         }
-        
+
+    # BBC-007: START populate image if necessary
+    if not progr_data['initial_children'][0]['images']:
+        progr_data['initial_children'][0]['images']['promotional'] = progr_data['images']['standard'] 
+    # BBC-007: END populate image if necessary        
+
     programme.update({
         # BBC-007: START use image with logo  
         # 'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
