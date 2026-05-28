@@ -403,44 +403,6 @@ def search_tmdb(category, name):
         print(f"Network/API error: {e}")
         return None, None
         
-        
-def get_episode_plot(tv_id, season_number, episode_number):
-    """
-    Fetches the plot (overview) of a specific TV episode from TMDB.
-    
-    Args:
-        tv_id (int): TMDB TV show ID.
-        season_number (int): Season number.
-        episode_number (int): Episode number.
-    
-    Returns:
-        str: Episode plot or an error message.
-    """
-    
-    API_KEY = "e92d7c9d19df047c576ee8724f174e07"  # Replace with your TMDB API key
-    BASE_URL = "https://api.themoviedb.org/3"
-    
-    url = f"{BASE_URL}/tv/{tv_id}/season/{season_number}/episode/{episode_number}"
-    params = {"api_key": API_KEY, "language": "en-US"}
-
-    try:
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()  # Raise HTTPError for bad responses
-        data = response.json()
-
-        # Check if overview exists
-        overview = data.get("overview", "").strip()
-        if not overview:
-            return "No plot available for this episode."
-        return overview
-
-    except requests.exceptions.HTTPError as http_err:
-        return f"HTTP error occurred: {http_err}"
-    except requests.exceptions.RequestException as req_err:
-        return f"Request error occurred: {req_err}"
-    except Exception as e:
-        return f"Unexpected error: {e}"
-
 
 def get_episode_info(tv_id, season_number, episode_number, language="en-US"):
 
@@ -530,8 +492,56 @@ def get_movie_info(movie_id):
         print(f"Unexpected error: {e}")
 
     return None
-        
+
+    
+def get_first_english_backdrop(tmdb_id: int) -> str:
+    
+    """
+    Fetch the first English backdrop URL for a TV show from TMDB.
+
+    Args:
+        api_key (str): Your TMDB API key.
+        tmdb_id (int): The TMDB ID of the TV show.
+
+    Returns:
+        str: Full URL of the first English backdrop, or None if not found.
+    """
+    
+    api_key = "e92d7c9d19df047c576ee8724f174e07"
+    
+    if not isinstance(api_key, str) or not api_key.strip():
+        raise ValueError("API key must be a non-empty string.")
+    if not isinstance(tmdb_id, int) or tmdb_id <= 0:
+        raise ValueError("TMDB ID must be a positive integer.")
+
+    base_url = "https://api.themoviedb.org/3"
+    endpoint = f"{base_url}/tv/{tmdb_id}/images"
+    params = {"api_key": api_key}
+
+    try:
+        response = requests.get(endpoint, params=params, timeout=10)
+        response.raise_for_status()
+    except requests.RequestException as e:
+        print(f"Error fetching data from TMDB: {e}")
+        return None
+
+    data = response.json()
+
+    # Filter backdrops with English text
+    backdrops = data.get("backdrops", [])
+    english_backdrops = [
+        b for b in backdrops if b.get("iso_639_1") == "en"
+    ]
+
+    if not english_backdrops:
+        return None
+
+    # TMDB image base URL (w1280 is a good size for backdrops)
+    image_base = "https://image.tmdb.org/t/p/w1280"
+    return image_base + english_backdrops[0]["file_path"]
+     
 # BBC-010: END functions to get episode plot via TMDb API
+
 
 # BBC-010: START def of CheckAutoplay_ListWatching and AddMenuEntry_ListWatching
 def CheckAutoplay_ListWatching(showtitle, episode_title, season, episode, episode_fanart, name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
