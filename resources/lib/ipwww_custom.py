@@ -369,7 +369,7 @@ def get_episode_data(subtitle, title, debug, itemtype):
 # BBC-010: END def get_episode_data
     
     
-# BBC-010: START functions to get episode plot via TMDb API
+# BBC-010: START functions to get data from the TMDb
 def search_tmdb(category, name):
     
     """
@@ -494,7 +494,7 @@ def get_movie_info(movie_id):
     return None
 
     
-def get_first_english_backdrop(tmdb_id: int) -> str:
+def get_first_english_backdrop(show_title) -> str:
     
     """
     Fetch the first English backdrop URL for a TV show from TMDB.
@@ -509,13 +509,23 @@ def get_first_english_backdrop(tmdb_id: int) -> str:
     
     api_key = "e92d7c9d19df047c576ee8724f174e07"
     
+    # establish if title is a TV Show or Movie
+    tmdb_id, tmdb_type = search_tmdb('tv', show_title) # try to get tmdb_id for tvshow
+    if tmdb_id == None:
+        tmdb_id, tmdb_type = search_tmdb('movie', show_title)  # if not found try to get tmdb_id for tvshow
+        if tmdb_id == None: # no TV Show or Movie with title
+            return None         
+    
     if not isinstance(api_key, str) or not api_key.strip():
         raise ValueError("API key must be a non-empty string.")
-    if not isinstance(tmdb_id, int) or tmdb_id <= 0:
-        raise ValueError("TMDB ID must be a positive integer.")
+        
+    if tmdb_type == 'tvshow':
+        endpoint_type = 'tv'
+    else:
+        endpoint_type = 'movie'        
 
     base_url = "https://api.themoviedb.org/3"
-    endpoint = f"{base_url}/tv/{tmdb_id}/images"
+    endpoint = f"{base_url}/{endpoint_type}/{tmdb_id}/images"    
     params = {"api_key": api_key}
 
     try:
@@ -540,7 +550,7 @@ def get_first_english_backdrop(tmdb_id: int) -> str:
     image_base = "https://image.tmdb.org/t/p/w1280"
     return image_base + english_backdrops[0]["file_path"]
      
-# BBC-010: END functions to get episode plot via TMDb API
+# BBC-010: END functions to get data from the TMDb
 
 
 # BBC-010: START def of CheckAutoplay_ListWatching and AddMenuEntry_ListWatching
