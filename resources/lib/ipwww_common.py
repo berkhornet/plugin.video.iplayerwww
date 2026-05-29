@@ -42,6 +42,7 @@ media_dir = xbmcvfs.translatePath('special://userdata/customisations/Addon Icons
 # BBC-009: END Custom root (Main menu)
 
 # BBC-008: START debug
+debug = True
 def log_message(message, level=xbmc.LOGINFO):
     """
     Logs a message to the Kodi log file.
@@ -508,12 +509,13 @@ def strptime(dt_str: str, format: str):
     return datetime(*(time.strptime(dt_str, format)[0:6]))
 
 
-def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', aired=None, resolution=None,
+# BBC-007: include fanart for Watchlist items
+# def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', aired=None, resolution=None,
+def AddMenuEntry(name, url, mode, iconimage, description='', fanart='', subtitles_url='', aired=None, resolution=None,
                  resume_time='', total_time='', episode_id='', stream_id='', context_mnu=None, replay_chan_id=''):
     """Adds a new line to the Kodi list of playables.
     It is used in multiple ways in the plugin, which are distinguished by modes.
     """
-
     if not iconimage:
         # BBC-001: Use iPlayer artwork 
         # iconimage="DefaultFolder.png"
@@ -552,13 +554,12 @@ def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', a
     listitem.setArt({'icon':'DefaultFolder.png', 'thumb':iconimage})
     
     # BBC-004: use fanart if relevant
-    # log_message('MODE = ' + str(mode))
-    if mode == 128:
-        listitem.setArt({'fanart':iconimage})
-    if mode == 139:
-        listitem.setArt({'fanart':iconimage})
-    if mode == 202:
-        listitem.setArt({'fanart':iconimage})    
+    log_message('MODE = ' + str(mode) + ' name = ' + name + ' fanart = x' + str(fanart) +'x')
+    if len(fanart) > 0: # Watchlist item
+        listitem.setArt({'landscape':iconimage})
+        listitem.setArt({'fanart': fanart})
+    elif mode in (128, 139, 202):
+        listitem.setArt({'fanart':iconimage}) 
     # BBC-004: END use fanart if relevant
 
     if mode in (201, 202, 203, 204, 205, 211, 212, 213):

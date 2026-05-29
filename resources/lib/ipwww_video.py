@@ -1010,6 +1010,9 @@ def SelectImage(images):
            or 'DefaultFolder.png').replace('{recipe}', '832x468')
 
 def ParseProgramme(progr_data, playable=False):
+    
+    # ParseProgramme is used for Watchlist litems
+    
     if playable:
         programme = {
             'url': 'https://www.bbc.co.uk/iplayer/episode/' + progr_data['id'],
@@ -1031,10 +1034,17 @@ def ParseProgramme(progr_data, playable=False):
     programme.update({
         # BBC-007: START use image with logo  
         # 'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
+        # 'description': SelectSynopsis(progr_data['synopses'])
         'iconimage': custom_select_image(progr_data['initial_children'][0]['images']),
+        'description': SelectSynopsis(progr_data['synopses']),
+        'fanart': progr_data['images']['standard'].replace('{recipe}', '832x468')
         # BBC-007: END use image with logo  
-        'description': SelectSynopsis(progr_data['synopses'])
-    })          
+    })
+    
+    # BBC-008: START debug
+    if debug == True:
+        log_message('ParseProgramme: programme = ' + str(programme))        
+    # BBC-008: END debug
     
     return programme
 
@@ -1750,12 +1760,16 @@ def ScrapeJSON(html):
     return json_data
 
 
-def CheckAutoplay(name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
+# BBC-007: add fanart to parameters for Watchlist
+# def CheckAutoplay(name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
+def CheckAutoplay(name, url, iconimage, description, fanart='', aired=None, resume_time="", total_time="", context_mnu=None):
     if ADDON.getSetting('streams_autoplay') == 'true':
         mode = 202
     else:
         mode = 122
-    AddMenuEntry(name, url, mode, iconimage, description, '', aired=aired,
+    # BBC-007: add fanart to parameters for Watchlist    
+    # AddMenuEntry(name, url, mode, iconimage, description, '', aired=aired,
+    AddMenuEntry(name, url, mode, iconimage, description, fanart, '', aired=aired,
                  resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)
 
 
