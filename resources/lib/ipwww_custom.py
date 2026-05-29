@@ -497,11 +497,10 @@ def get_movie_info(movie_id):
 def get_first_english_backdrop(show_title) -> str:
     
     """
-    Fetch the first English backdrop URL for a TV show from TMDB.
+    Fetch the first English backdrop URL for a TV Show or Movie from TMDB.
 
     Args:
-        api_key (str): Your TMDB API key.
-        tmdb_id (int): The TMDB ID of the TV show.
+        show_title : The title of the TV Show or Movie.
 
     Returns:
         str: Full URL of the first English backdrop, or None if not found.
@@ -510,9 +509,9 @@ def get_first_english_backdrop(show_title) -> str:
     api_key = "e92d7c9d19df047c576ee8724f174e07"
     
     # establish if title is a TV Show or Movie
-    tmdb_id, tmdb_type = search_tmdb('tv', show_title) # try to get tmdb_id for tvshow
+    tmdb_id, tmdb_type = search_tmdb('tv', show_title) # try to get tmdb_id for TV Show
     if tmdb_id == None:
-        tmdb_id, tmdb_type = search_tmdb('movie', show_title)  # if not found try to get tmdb_id for tvshow
+        tmdb_id, tmdb_type = search_tmdb('movie', show_title)  # if not found try to get tmdb_id for Movie
         if tmdb_id == None: # no TV Show or Movie with title
             return None         
     
