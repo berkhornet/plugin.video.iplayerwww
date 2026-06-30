@@ -571,6 +571,11 @@ def AddMenuEntry_ListWatching(show_title, episode_title, season, episode, episod
     """
 
     from .ipwww_common import utf8_quote_plus
+    
+    # START clean up input data
+    if not total_time:
+        total_time = '0'
+    # END clean up data
         
     # START get data from TMDb
     tmdb_id, tmdb_type = search_tmdb('tv', show_title) # try to get tmdb_id for tvshow
