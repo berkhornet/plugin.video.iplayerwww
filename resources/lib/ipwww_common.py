@@ -672,7 +672,7 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
                                 url=listitem_url, listitem=listitem, isFolder=isFolder)
     # BBC-003: Custom viewtypes
-    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+    # xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
     return True
 
 def KidsMode():
