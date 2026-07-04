@@ -558,7 +558,6 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
     listitem.setArt({'icon':'DefaultFolder.png', 'thumb':iconimage})
     
     # BBC-004: use fanart if relevant
-    log_message('MODE = ' + str(mode) + ' name = ' + name + ' fanart = x' + str(fanart) +'x')
     if len(fanart) > 0: # Watchlist item
         listitem.setArt({'landscape':iconimage})
         listitem.setArt({'fanart': fanart})
