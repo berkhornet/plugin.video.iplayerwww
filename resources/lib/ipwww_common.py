@@ -507,15 +507,19 @@ def iso_duration_2_seconds(iso_str: str) -> int:
 def strptime(dt_str: str, format: str):
     """A bug free alternative to `datetime.datetime.strptime(...)`"""
     return datetime(*(time.strptime(dt_str, format)[0:6]))
-
-
-# BBC-007: include fanart for Watchlist items
+   
+# BBC-007 and BBC-011: Custom defintion for AddMenuEntry
 # def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', aired=None, resolution=None,
-def AddMenuEntry(name, url, mode, iconimage, description='', fanart='', subtitles_url='', aired=None, resolution=None,
+                 #resume_time='', total_time='', episode_id='', stream_id='', context_mnu=None, replay_chan_id=''):  
+
+def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', episode_title='', season=0, episode=0, episode_fanart='', 
+                 description='', fanart='',subtitles_url='', aired=None, resolution=None,
                  resume_time='', total_time='', episode_id='', stream_id='', context_mnu=None, replay_chan_id=''):
+                     
     """Adds a new line to the Kodi list of playables.
     It is used in multiple ways in the plugin, which are distinguished by modes.
-    """
+    """ 
+    
     if not iconimage:
         # BBC-001: Use iPlayer artwork 
         # iconimage="DefaultFolder.png"
@@ -561,44 +565,96 @@ def AddMenuEntry(name, url, mode, iconimage, description='', fanart='', subtitle
     elif mode in (128, 139, 202):
         listitem.setArt({'fanart':iconimage}) 
     # BBC-004: END use fanart if relevant
-
-    if mode in (201, 202, 203, 204, 205, 211, 212, 213):
-        if aired:
-            listitem.setInfo("video", {
-                "title": name,
-                "plot": description,
-                "plotoutline": description,
-                "date": date_string,
-                "aired": aired,
-                "mediatype" : "episode"})
+    
+    # BBC-011: START Custom ListWatching Processing   
+    if listwatching == True:
+        from resources.lib.ipwww_custom import (search_tmdb, get_movie_info, get_episode_info)
+        # Clean up input data
+        if not total_time:
+            total_time = '0'
+        # Get data from TMDb
+        tmdb_id, tmdb_type = search_tmdb('tv', showtitle) # try to get tmdb_id for tvshow
+        if tmdb_id == None:
+            tmdb_id, tmdb_type = search_tmdb('movie', showtitle)  # if not found try to get tmdb_id for tvshow
+            if tmdb_id == None:
+                description = "Movie: No plot information available."        
+            else: 
+                movie_info = get_movie_info(tmdb_id) # get plot for movie using tmdb_id          
+        else: # we have tvshow tmdb_id              
+            episode_info = get_episode_info(tmdb_id, int(season), int(episode))  # get plot for tvshow using tmdb_id     
+        # Setup Infotag
+        info_tag = listitem.getVideoInfoTag()
+        if tmdb_type == 'tvshow':
+            info_tag.setTvShowTitle(showtitle)
+            info_tag.setSeason(int(season))
+            info_tag.setEpisode(int(episode))
+            info_tag.setTitle(episode_title)
+            info_tag.setPlot(episode_info['overview'])
+            info_tag.setPlotOutline(episode_info['overview'])
+            info_tag.setPremiered(episode_info['air_date'])
+            info_tag.setMediaType("episode")
+            info_tag.setDuration(int(total_time)) 
+        elif tmdb_type == 'movie':
+            info_tag.setTitle(showtitle)
+            info_tag.setPlot(movie_info['overview'])
+            info_tag.setPlotOutline(movie_info['overview'])
+            info_tag.setPremiered(movie_info['release_date'])
+            info_tag.setTagLine(movie_info['tagline'])
+            info_tag.setMediaType("movie")
+            info_tag.setDuration(int(total_time))
+            #listitem.setArt({'fanart': iconimage}) # don't know why this is needed
         else:
-            listitem.setInfo("video", {
-                "title": name,
-                "plot": description,
-                "plotoutline": description,
-                # BBC-004: prevent "programme title" being duplicated for Continue Watching items
-                # "mediatype" : "episode"})
-                "mediatype" : "video"})
-
+            info_tag.setTitle(name)
+            info_tag.setPlot(description)
+            info_tag.setPlotOutline(description)
+            info_tag.setMediaType("video") 
+            info_tag.setDuration(int(total_time))    
+            if aired:
+                info_tag.setPremiered(aired)
+                info_tag.setDate(date_string) 
         if resume_time:
-            listitem.setProperty('ResumeTime', resume_time)
-            listitem.setProperty('TotalTime', total_time if total_time else '7200')
-    else:
-        if aired:
-            listitem.setInfo("video", {
-                "title": name,
-                "plot": description,
-                "plotoutline": description,
-                "date": date_string,
-                "aired": aired})
-        else:
-            listitem.setInfo("video", {
-                "title": name,
-                "plot": description,
-                "plotoutline": description})
+            info_tag.setResumePoint(float(resume_time), float(total_time))
+        if context_mnu:
+            listitem.addContextMenuItems(context_mnu)
 
-    if context_mnu:
-        listitem.addContextMenuItems(context_mnu)
+    if listwatching == False:
+        if mode in (201, 202, 203, 204, 205, 211, 212, 213):
+            if aired:
+                listitem.setInfo("video", {
+                    "title": name,
+                    "plot": description,
+                    "plotoutline": description,
+                    "date": date_string,
+                    "aired": aired,
+                    "mediatype" : "episode"})
+            else:
+                listitem.setInfo("video", {
+                    "title": name,
+                    "plot": description,
+                    "plotoutline": description,
+                    # BBC-004: prevent "programme title" being duplicated for Continue Watching items
+                    # "mediatype" : "episode"})
+                    "mediatype" : "video"})
+
+            if resume_time:
+                listitem.setProperty('ResumeTime', resume_time)
+                listitem.setProperty('TotalTime', total_time if total_time else '7200')
+        else:
+            if aired:
+                listitem.setInfo("video", {
+                    "title": name,
+                    "plot": description,
+                    "plotoutline": description,
+                    "date": date_string,
+                    "aired": aired})
+            else:
+                listitem.setInfo("video", {
+                    "title": name,
+                    "plot": description,
+                    "plotoutline": description})
+        if context_mnu:
+            listitem.addContextMenuItems(context_mnu)
+    # BBC-011: END Custom ListWatching Processing   
 
     video_streaminfo = {'codec': 'h264'}
     if not isFolder:
@@ -616,9 +672,8 @@ def AddMenuEntry(name, url, mode, iconimage, description='', fanart='', subtitle
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),
                                 url=listitem_url, listitem=listitem, isFolder=isFolder)
     # BBC-003: Custom viewtypes
-    # xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+    xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
     return True
-
 
 def KidsMode():
     dialog = xbmcgui.Dialog()

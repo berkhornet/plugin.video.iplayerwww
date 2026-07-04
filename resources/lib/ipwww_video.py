@@ -44,8 +44,6 @@ from .ipwww_custom import strip_after
 from .ipwww_custom import create_af3_style_episode_header
 from .ipwww_custom import custom_select_image
 from .ipwww_custom import get_episode_data
-from .ipwww_custom import AddMenuEntry_ListWatching
-from .ipwww_custom import CheckAutoplay_ListWatching
 
 import requests
 # BBC-004: END import custom functions       
@@ -1269,7 +1267,7 @@ def ListWatching():
         item_data['iconimage'] = custom_select_image(images)
         # BBC-007: END use image with logo
 
-        # BBC-010: START extract episode title, season number and episode number from episode data
+        # BBC-011: START extract episode title, season number and episode number from episode data
         try:
             description = episode['subtitle']
             title = ""
@@ -1280,8 +1278,11 @@ def ListWatching():
             itemtype = 'movie'  
         isEpisode, episode_title, season_nr, episode_nr = get_episode_data(description, title, debug, itemtype)
         item_data['name'] = episode_title
-        item_data['description'] = "No plot information available."        
-        # BBC-010: END extract episode title, season number and episode number from episode data
+        item_data['description'] = "No plot information available."
+        item_data['episode_title'] = episode_title
+        item_data['season'] = season_nr
+        item_data['episode'] = episode_nr       
+        # BBC-011: END extract episode title, season number and episode number from episode data
          
         # Lacking a field synopses, a watching item's description is empty. Since the
         # remaining playtime is presented in the title instead of the usual episode name,
@@ -1317,14 +1318,15 @@ def ListWatching():
             ct_menus.append((translation(30601),
                              f'RunPlugin(plugin://plugin.video.iplayerwww?mode=301&episode_id={programme_id}&url=url)'))
 
-        # BBC-010: START custom AddMenuEntry
-        episode_fanart = episode['images']['standard'].replace('{recipe}', '832x468')
+        # BBC-011: START custom AddMenuEntry
+        item_data['episode_fanart'] = episode['images']['standard'].replace('{recipe}', '832x468')
+        item_data['listwatching'] = True
         if isEpisode == True:
-            show_title = episode['title']
-            CheckAutoplay_ListWatching(show_title, episode_title, season_nr, episode_nr, episode_fanart, **item_data)
+            item_data['showtitle'] = episode['title']
+            CheckAutoplay(**item_data)
         else:
             CheckAutoplay(**item_data)
-        # BBC-010: END custom AddMenuEntry
+        # BBC-011: END custom AddMenuEntry
 
 
 def RemoveWatching(episode_id):
@@ -1761,16 +1763,19 @@ def ScrapeJSON(html):
 
 
 # BBC-007: add fanart to parameters for Watchlist
+# BBC-011: Custom ListWatching Processing
 # def CheckAutoplay(name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
-def CheckAutoplay(name, url, iconimage, description, fanart='', aired=None, resume_time="", total_time="", context_mnu=None):
+def CheckAutoplay(name, url, iconimage, listwatching=False, showtitle='', episode_title='', season=0, episode=0, episode_fanart='',
+                  description='', fanart='', aired=None, resume_time="", total_time="", context_mnu=None):
     if ADDON.getSetting('streams_autoplay') == 'true':
         mode = 202
     else:
         mode = 122
     # BBC-007: add fanart to parameters for Watchlist    
     # AddMenuEntry(name, url, mode, iconimage, description, '', aired=aired,
-    AddMenuEntry(name, url, mode, iconimage, description, fanart, '', aired=aired,
-                 resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)
+                 # resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)
+    AddMenuEntry(name, url, mode, iconimage, listwatching, showtitle, episode_title, season, episode, episode_fanart, 
+                 description, fanart, aired=aired, resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)                 
 
 
 def GetSchedules(channel_list):
