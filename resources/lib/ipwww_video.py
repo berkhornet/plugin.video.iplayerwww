@@ -1288,7 +1288,7 @@ def ListWatching():
         # remaining playtime is presented in the title instead of the usual episode name,
         # place the original title/sub-title in the description.
         
-        # BBC-010: Plot will be obtained from TMDb by CheckAutoplay_ListWatching    
+        # BBC-011: Plot will be obtained from TMDb by AddMenuEntry
 
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
