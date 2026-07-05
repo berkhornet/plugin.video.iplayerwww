@@ -592,7 +592,11 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
             info_tag.setPlotOutline(episode_info['overview'])
             info_tag.setPremiered(episode_info['air_date'])
             info_tag.setMediaType("episode")
-            info_tag.setDuration(int(total_time)) 
+            info_tag.setDuration(int(total_time))
+
+            listitem.setArt({'fanart': episode_fanart})
+            listitem.setArt({'landscape': iconimage})
+            
         elif tmdb_type == 'movie':
             info_tag.setTitle(showtitle)
             info_tag.setPlot(movie_info['overview'])
@@ -601,7 +605,10 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
             info_tag.setTagLine(movie_info['tagline'])
             info_tag.setMediaType("movie")
             info_tag.setDuration(int(total_time))
-            #listitem.setArt({'fanart': iconimage}) # don't know why this is needed
+            
+            listitem.setArt({'fanart': episode_fanart})
+            listitem.setArt({'landscape': iconimage})
+            
         else:
             info_tag.setTitle(name)
             info_tag.setPlot(description)
