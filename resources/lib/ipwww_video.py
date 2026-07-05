@@ -800,7 +800,9 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
             added_directories.append(main_url)
     elif main_url:
         if not main_url in added_playables:
-            CheckAutoplay(title , main_url, icon, synopsis, aired)
+            # BBC-011: updated argument list needed
+            # CheckAutoplay(title , main_url, icon, synopsis, aired)
+            CheckAutoplay(title, main_url, icon, False, '', '', 0, 0, '', synopsis, '', aired, '', '', None)
             added_playables.append(main_url)
 
 
