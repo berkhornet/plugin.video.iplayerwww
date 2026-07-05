@@ -1325,6 +1325,7 @@ def ListWatching():
             item_data['showtitle'] = episode['title']
             CheckAutoplay(**item_data)
         else:
+            item_data['showtitle'] = item_data['name']
             CheckAutoplay(**item_data)
         # BBC-011: END custom AddMenuEntry
 
