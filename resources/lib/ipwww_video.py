@@ -795,8 +795,11 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
                 episodes_title = title
             # BBC-004: remove Bold highlight
             # AddMenuEntry('[B]%s[/B]' % (episodes_title),
-            AddMenuEntry('%s' % (episodes_title),
-                         episodes_url, 128, icon, synopsis, '')
+            # BBC-011: updated argument list needed
+            # AddMenuEntry('%s' % (episodes_title),
+                         # episodes_url, 128, icon, synopsis, '')
+            AddMenuEntry('%s' % (episodes_title), episodes_url, 128, icon, False, '', '', 0, 0, '', 
+                         synopsis, '','', '', '', '', '', '', '', None, '')               
             added_directories.append(main_url)
     elif main_url:
         if not main_url in added_playables:
