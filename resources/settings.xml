@@ -107,7 +107,7 @@
                                     <control type="toggle"/>
                                 </setting>
                                 <!-- BBC-007: START Use image with logo -->
-                                <setting id="prefer_image_logo" type="boolean" label="30191" help="">
+                                <setting id="prefer_image_logo" type="boolean" label="30191" help="Use artwork with logos if available">
                                     <level>0</level>
                                     <default>false</default>
                                     <control type="toggle"/>
