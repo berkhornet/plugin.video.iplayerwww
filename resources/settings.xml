@@ -113,6 +113,13 @@
                                     <control type="toggle"/>
                                 </setting>
                                 <!-- BBC-007: END Use image with logo -->
+                                <!-- BBC-012: START Option for concise titles -->
+                                <setting id="prefer_concise_titles" type="boolean" label="30192" help="Remove extraneous text and highlighting from titles">
+                                    <level>0</level>
+                                    <default>false</default>
+                                    <control type="toggle"/>
+                                </setting>
+                                <!-- BBC-012: END Option for concise titles -->
 			</group>
 			<group id="2" label="30102">
                                 <setting id="radio_paginate_episodes" type="integer" label="30170" help="">

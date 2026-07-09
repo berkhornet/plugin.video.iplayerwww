@@ -109,6 +109,11 @@ msgctxt "#30191"
 msgid "Prefer images with logo"
 msgstr ""
 
+# BBC-012: Option for concise titles
+msgctxt "#30192"
+msgid "Prefer concise titles"
+msgstr ""
+
 msgctxt "#30200"
 msgid "Streams"
 msgstr ""

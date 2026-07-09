@@ -189,9 +189,13 @@ def ListLive():
     schedules = GetSchedules(channel_list)
     for id, name, schedule_chan_id in channel_list:
         now_on, schedule = schedules.get(schedule_chan_id, ('', ''))
-        # BBC-004: remove orange highlighting
+        # BBC-012: START optionally remove orange highlighting
         # title = '{}    [COLOR orange]{}[/COLOR]'.format(name, now_on)
-        title = '{}    {}'.format(name, now_on)
+        if ADDON.getSetting('prefer_concise_titles') == 'false':    
+            title = '{}    [COLOR orange]{}[/COLOR]'.format(name, now_on)
+        else:
+            title = '{}    {}'.format(name, now_on)
+        # BBC-012: END optionally remove orange highlighting
 
         iconimage = 'resource://resource.images.iplayerwww/media/'+id+'.png'
 
@@ -478,10 +482,13 @@ def ScrapeEpisodes(page_url):
         if int(ADDON.getSetting('paginate_episodes')) == 0:
             if current_page < next_page:
                 page_url = 'https://www.bbc.co.uk' + page_base_url + str(next_page)
-                # BBC-004: remove colour from "Next Page" text              
+                # BBC-012: START remove colour from "Next Page" text              
                 # AddMenuEntry(" [COLOR ffffa500]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
-                AddMenuEntry(" [COLOR white]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
-
+                if ADDON.getSetting('prefer_concise_titles') == 'false':    
+                    AddMenuEntry(" [COLOR ffffa500]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
+                else:
+                    AddMenuEntry(" [COLOR white]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
+                # BBC-012: END remove colour from "Next Page" text              
 
 def ScrapeAtoZEpisodes(page_url):
     """Creates a list of programmes on one standard HTML page.
@@ -547,9 +554,13 @@ def ScrapeAtoZEpisodes(page_url):
         if int(ADDON.getSetting('paginate_episodes')) == 0:
             if current_page < next_page:
                 page_url = page_base_url + str(next_page)
-                # BBC-004: remove colour from "Next Page" text              
+                # BBC-012: START remove colour from "Next Page" text              
                 # AddMenuEntry(" [COLOR ffffa500]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
-                AddMenuEntry(" [COLOR white]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
+                if ADDON.getSetting('prefer_concise_titles') == 'false':    
+                    AddMenuEntry(" [COLOR ffffa500]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
+                else:
+                    AddMenuEntry(" [COLOR white]%s >>[/COLOR]" % translation(30320), page_url, 128, '', '', '')
+                # BBC-012: END remove colour from "Next Page" text              
 
 def ListCategories():
     """Parses the available categories and creates directories for selecting one of them.
@@ -784,9 +795,13 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
 
     if num_episodes:
         if not main_url in added_directories:
-            # BBC-004: remove "x episodes available" from title
+            # BBC-012: START remove "x episodes available" from title
             # title = '[B]'+item['title']+'[/B] - '+num_episodes+' episodes available'
-            title = item['title']
+            if ADDON.getSetting('prefer_concise_titles') == 'false':    
+                title = '[B]'+item['title']+'[/B] - '+num_episodes+' episodes available'
+            else:
+                title = item['title']
+            # BBC-012: END remove "x episodes available" from title              
             AddMenuEntry(title, main_url, 139, icon, synopsis, '')
             added_directories.append(main_url)
 
@@ -794,13 +809,24 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
         if not episodes_url in added_directories:
             if episodes_title=='':
                 episodes_title = title
-            # BBC-004: remove Bold highlight
+            # BBC-012: START remove Bold highlight
             # AddMenuEntry('[B]%s[/B]' % (episodes_title),
-            # BBC-011: updated argument list needed
-            # AddMenuEntry('%s' % (episodes_title),
-                         # episodes_url, 128, icon, synopsis, '')
-            AddMenuEntry('%s' % (episodes_title), episodes_url, 128, icon, False, '', '', 0, 0, '', 
-                         synopsis, '','', '', '', '', '', '', '', None, '')               
+            #              episodes_url, 128, icon, synopsis, '')
+            if ADDON.getSetting('prefer_concise_titles') == 'false':
+                # BBC-011: START updated argument list needed                
+                # AddMenuEntry('[B]%s[/B]' % (episodes_title),
+                             # episodes_url, 128, icon, synopsis, '')
+                AddMenuEntry('B]%s[/B]' % (episodes_title), episodes_url, 128, icon, False, '', '', 0, 0, '', 
+                         synopsis, '','', '', '', '', '', '', '', None, '')
+                # BBC-011: END updated argument list needed                                        
+            else:
+                # BBC-011: START updated argument list needed                
+                # AddMenuEntry('%s' % (episodes_title),
+                             # episodes_url, 128, icon, synopsis, '')
+                AddMenuEntry('%s' % (episodes_title), episodes_url, 128, icon, False, '', '', 0, 0, '', 
+                         synopsis, '','', '', '', '', '', '', '', None, '')                              
+                # BBC-011: END updated argument list needed                                                                   
+            # BBC-012: END remove Bold highlight               
             added_directories.append(main_url)
     elif main_url:
         if not main_url in added_playables:
@@ -844,10 +870,15 @@ def ParseJSON(programme_data, current_url):
                                 continue
                             base_url = url_split[0]
                             series_url = base_url + '?seriesId=' + series['id']
-                            # BBC-004: Remove Bold Highlight                          
+                            # BBC-012: START Remove Bold Highlight                          
                             # AddMenuEntry('[B]%s: %s[/B]' % (name, series['title']),
-                            AddMenuEntry('%s: %s' % (name, series['title']),                            
-                                         series_url, 128, '', '', '')
+                            if ADDON.getSetting('prefer_concise_titles') == 'false':
+                                AddMenuEntry('[B]%s: %s[/B]' % (name, series['title']),
+                                             series_url, 128, '', '', '')
+                            else:
+                                AddMenuEntry('%s: %s' % (name, series['title']),                            
+                                             series_url, 128, '', '', '')
+                            # BBC-012: END Remove Bold Highlight                          
 
         programmes = None
         if 'currentLetter' in programme_data:
@@ -874,10 +905,17 @@ def ParseJSON(programme_data, current_url):
                             continue
                         base_url = url_split[0]
                         series_url = base_url + '?seriesId=' + series['id']
-                        # BBC-004: Remove Bold Highlight                          
-                        # AddMenuEntry('[B]%s: %s[/B]' % (name, series['title']['default']),                      
-                        AddMenuEntry('%s: %s' % (name, series['title']['default']),
-                                     series_url, 128, '', '', '')
+                        # BBC-012: START Remove Bold Highlight                                                   
+                        # AddMenuEntry('[B]%s: %s[/B]' % (name, series['title']['default']),
+                                     # series_url, 128, '', '', '')
+                        if ADDON.getSetting('prefer_concise_titles') == 'false':
+                            AddMenuEntry('[B]%s: %s[/B]' % (name, series['title']['default']),
+                                         series_url, 128, '', '', '')
+                        else:
+                            AddMenuEntry('%s: %s' % (name, series['title']['default']),
+                                         series_url, 128, '', '', '')
+                        # BBC-012: END Remove Bold Highlight                                                   
+                                         
         elif 'items' in programme_data:
             # This must be Watchlist or Continue Watching.
             programmes = programme_data['items']
@@ -917,10 +955,15 @@ def ParseJSON(programme_data, current_url):
                 if (title and id):
                     episodes_url = 'https://www.bbc.co.uk/iplayer/group/%s' % id
                     if not episodes_url in added_directories:
-                        # BBC-004: Remove Bold Highlight
-                        # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),                       
-                        AddMenuEntry('%s: %s' % (translation(30314), title),
-                                     episodes_url, 128, '', '', '')
+                        # BBC-012: START Remove Bold Highlight
+                        # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
+                        if ADDON.getSetting('prefer_concise_titles') == 'false':
+                            AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
+                                         episodes_url, 128, '', '', '')
+                        else:
+                            AddMenuEntry('%s: %s' % (translation(30314), title),
+                                         episodes_url, 128, '', '', '')
+                        # BBC-012: END Remove Bold Highlight
 
         if 'highlights' in programme_data:
             highlights = programme_data.get('highlights')
@@ -951,22 +994,40 @@ def ParseJSON(programme_data, current_url):
                     if title:
                         if (id and (type == 'group')):
                             if (id == 'popular'):
-                                # BBC-004: Remove Bold Highlight
-                                # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),                              
-                                AddMenuEntry('%s: %s' % (translation(30314), title),
-                                             'url', 105, '', '', '')
+                                # BBC-012: START Remove Bold Highlight
+                                # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
+                                             # 'url', 105, '', '', '')
+                                if ADDON.getSetting('prefer_concise_titles') == 'false':
+                                    AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
+                                                 'url', 105, '', '', '')
+                                else:
+                                    AddMenuEntry('%s: %s' % (translation(30314), title),
+                                                 'url', 105, '', '', '')
+                                # BBC-012: END Remove Bold Highlight                                                
                             else:
                                 episodes_url = 'https://www.bbc.co.uk/iplayer/group/%s' % id
                                 if not episodes_url in added_directories:
-                                    # BBC-004: Remove Bold Highlight
-                                    # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),                                  
-                                    AddMenuEntry('%s: %s' % (translation(30314), title),
-                                                 episodes_url, 128, '', '', '')
+                                    # BBC-012: START Remove Bold Highlight
+                                    # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title), 
+                                                 # episodes_url, 128, '', '', '')
+                                    if ADDON.getSetting('prefer_concise_titles') == 'false':
+                                        AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title), 
+                                                     episodes_url, 128, '', '', '')
+                                    else:                                                     
+                                        AddMenuEntry('%s: %s' % (translation(30314), title),
+                                                     episodes_url, 128, '', '', '')
+                                    # BBC-012: END Remove Bold Highlight                                                 
                         if (id and (type == 'category')):
-                            # BBC-004: Remove Bold Highlight
+                            # BBC-012: START Remove Bold Highlight
                             # AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
-                            AddMenuEntry('%s: %s' % (translation(30314), title),
-                                         id, 126, '', '', '')
+                                         # id, 126, '', '', '')
+                            if ADDON.getSetting('prefer_concise_titles') == 'false':
+                                AddMenuEntry('[B]%s: %s[/B]' % (translation(30314), title),
+                                             id, 126, '', '', '')
+                            else:
+                                AddMenuEntry('%s: %s' % (translation(30314), title),
+                                             id, 126, '', '', '')
+                            # BBC-012: END Remove Bold Highlight
 
     xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_VIDEO_TITLE)
     xbmcplugin.addSortMethod(int(sys.argv[1]), xbmcplugin.SORT_METHOD_DATE)
@@ -1044,12 +1105,22 @@ def ParseProgramme(progr_data, playable=False):
             'name': progr_data['title']
         }
     else:
-        programme = {
-            'url': 'https://www.bbc.co.uk/iplayer/episodes/' + progr_data['id'],
-            # BBC-004: remove "x episodes available" from title
+        # BBC-012: START remove "x episodes available" from title
+        # programme = {
+            # 'url': 'https://www.bbc.co.uk/iplayer/episodes/' + progr_data['id'],
             # 'name': '[B]{}[/B] - {} episodes available'.format(progr_data['title'], progr_data['count'])
+        # }
+        if ADDON.getSetting('prefer_concise_titles') == 'false':
+            programme = {
+            'url': 'https://www.bbc.co.uk/iplayer/episodes/' + progr_data['id'],
+            'name': '[B]{}[/B] - {} episodes available'.format(progr_data['title'], progr_data['count'])
+            }
+        else:    
+            programme = {
+            'url': 'https://www.bbc.co.uk/iplayer/episodes/' + progr_data['id'],            
             'name': '{}'.format(progr_data['title'])
-        }
+            }
+        # BBC-012: END remove "x episodes available" from title
 
     # BBC-007: START populate image if necessary
     if not progr_data['initial_children'][0]['images']:
@@ -1331,16 +1402,25 @@ def ListWatching():
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
             total_seconds = int(remaining_seconds * 100 / (100 - watching_item.get('progress', 0)))
-            # BBC-004: remove "minutes left" from title
+            # BBC-012: START remove "minutes left" from title
             # item_data['name'] = '{} - [I]{} min left[/I]'.format(episode.get('title', ''), int(remaining_seconds / 60))
-            item_data['name'] = '{}'.format(episode.get('title', ''))
+            if ADDON.getSetting('prefer_concise_titles') == 'false':
+                item_data['name'] = '{} - [I]{} min left[/I]'.format(episode.get('title', ''), int(remaining_seconds / 60))
+            else:
+                item_data['name'] = '{}'.format(episode.get('title', ''))
+            # BBC-012: END remove "minutes left" from title
+                
             # Resume a little bit earlier, so it's easier to recognise where you've left off.
             item_data['resume_time'] = str(max(total_seconds - remaining_seconds - 10, 0))
             item_data['total_time'] = str(total_seconds)
         else:
-            # BBC-004: remove "next episode" from title
+            # BBC-012: START remove "next episode" from title
             # item_data['name'] = '{} - [I]next episode[/I]'.format(episode.get('title', ''))
-            item_data['name'] = '{}'.format(episode.get('title', ''))
+            if ADDON.getSetting('prefer_concise_titles') == 'false':
+                item_data['name'] = '{} - [I]next episode[/I]'.format(episode.get('title', ''))
+            else:
+                item_data['name'] = '{}'.format(episode.get('title', ''))
+            # BBC-012: END remove "next episode" from title
 
         item_data['context_mnu'] = ct_menus = []
         programme_id = episode.get('tleo_id')

@@ -557,13 +557,13 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
     listitem = xbmcgui.ListItem(label=name, label2=description)
     listitem.setArt({'icon':'DefaultFolder.png', 'thumb':iconimage})
     
-    # BBC-004: use fanart if relevant
+    # BBC-007: START use fanart if relevant
     if len(fanart) > 0: # Watchlist item
         listitem.setArt({'landscape':iconimage})
         listitem.setArt({'fanart': fanart})
     elif mode in (128, 139, 202):
         listitem.setArt({'fanart':iconimage}) 
-    # BBC-004: END use fanart if relevant
+    # BBC-007: END use fanart if relevant
     
     # BBC-011: START Custom ListWatching Processing   
     if listwatching == True:
