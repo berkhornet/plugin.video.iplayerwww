@@ -42,7 +42,6 @@ from .ipwww_custom import log_message
 from .ipwww_custom import strip_before
 from .ipwww_custom import strip_after
 from .ipwww_custom import create_af3_style_episode_header
-from .ipwww_custom import custom_select_image
 from .ipwww_custom import get_episode_data
 
 import requests
@@ -682,13 +681,15 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
                     title = str(subitem['title'].get('default'))        
         # BBC-006: END create AF3 style episode header
         
+        # BBC-007: START use images with logo
+        # if subitem.get('image'):
+            # if 'default' in subitem.get('image'):
+                # icon = subitem['image'].get('default').replace("{recipe}","832x468")               
         if subitem.get('image'):
-            if 'default' in subitem.get('image'):
-                # BBC-007 START: use image with logo
-                # icon = subitem['image'].get('default').replace("{recipe}","832x468")
-                images = subitem['image']
-                icon = custom_select_image(images)
-                # BBC-007 END: use image with logo 
+            images = subitem['image']
+            icon = SelectImage(images)
+        # BBC-007: END use images with logo
+            
     else:
         if 'count' in item:
             if item['count']>1:
@@ -774,7 +775,7 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
             # icon = item['images']['standard'].replace("{recipe}","832x468")
         if 'images' in item:
             images = item['images']    
-            icon = custom_select_image(images)
+            icon = SelectImage(images)
         # BBC-007: END use images with logo
             
         elif 'sources' in item:
@@ -890,9 +891,10 @@ def ParseJSON(programme_data, current_url):
                 elif 'contentItemProps' in item:
                     meta = item.get('type')
                     item = item.get('contentItemProps')
-                # BBC-007: START use images with logo if they exist in 'item'  
-                if 'initial_children' in item:
-                    item['images'] = item['initial_children'][0]['images']
+                # BBC-007: START use images with logo if they exist in 'item' 
+                if ADDON.getSetting('prefer_image_logo') == 'true':       
+                    if 'initial_children' in item:
+                        item['images'] = item['initial_children'][0]['images']
                 # BBC-007: END use images with logo if they exist in 'item'  
                 ParseSingleJSON(meta, item, name, added_playables, added_directories)
 
@@ -1001,16 +1003,36 @@ def SelectSynopsis(synopses):
         else:
             raise
 
+# BBC-007: START use image with logo
+# def SelectImage(images):
+    # if not images:
+        # return 'DefaultFolder.png'
+    # return(images.get('standard')
+           # or images.get('default')
+           # or images.get('promotional')
+           # or images.get('promotional_with_logo')
+           # or images.get('portrait')
+           # or 'DefaultFolder.png').replace('{recipe}', '832x468')
 
 def SelectImage(images):
     if not images:
         return 'DefaultFolder.png'
-    return(images.get('standard')
-           or images.get('default')
-           or images.get('promotional')
-           or images.get('promotional_with_logo')
-           or images.get('portrait')
-           or 'DefaultFolder.png').replace('{recipe}', '832x468')
+    if ADDON.getSetting('prefer_image_logo') == 'false':    
+        return(images.get('standard')
+               or images.get('default')
+               or images.get('promotional')
+               or images.get('promotional_with_logo')
+               or images.get('portrait')
+               or 'DefaultFolder.png').replace('{recipe}', '832x468')
+    else:           
+        return(images.get('promotional_with_logo')
+               or images.get('promotionalWithLogo')
+               or images.get('promotional')
+               or images.get('standard')
+               or images.get('default')
+               or images.get('portrait')
+               or 'DefaultFolder.png').replace('{recipe}', '832x468')
+# BBC-007: END use image with logo
 
 def ParseProgramme(progr_data, playable=False):
     
@@ -1034,15 +1056,24 @@ def ParseProgramme(progr_data, playable=False):
         progr_data['initial_children'][0]['images']['promotional'] = progr_data['images']['standard'] 
     # BBC-007: END populate image if necessary        
 
-    programme.update({
-        # BBC-007: START use image with logo  
+    # BBC-007: START use image with logo
+    # programme.update({
         # 'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
         # 'description': SelectSynopsis(progr_data['synopses'])
-        'iconimage': custom_select_image(progr_data['initial_children'][0]['images']),
-        'description': SelectSynopsis(progr_data['synopses']),
-        'fanart': progr_data['images']['standard'].replace('{recipe}', '832x468')
-        # BBC-007: END use image with logo  
-    })
+    # })
+    
+    if ADDON.getSetting('prefer_image_logo') == 'false':
+        programme.update({
+            'iconimage': progr_data.get('images', {}).get('standard', 'DefaultFolder.png').replace('{recipe}', '832x468'),
+            'description': SelectSynopsis(progr_data['synopses'])
+        })
+    else:
+        programme.update({
+            'iconimage': SelectImage(progr_data['initial_children'][0]['images']),
+            'fanart': progr_data['images']['standard'].replace('{recipe}', '832x468'),
+            'description': SelectSynopsis(progr_data['synopses'])
+        })        
+    # BBC-007: END use image with logo
     
     # BBC-008: START debug
     if debug == True:
@@ -1267,9 +1298,11 @@ def ListWatching():
             log_message('ListWatching: item_data = ' + str(item_data))          
         # BBC-008: END debug
             
-        # BBC-007: START use image with logo            
-        images = episode['images']    
-        item_data['iconimage'] = custom_select_image(images)
+        # BBC-007: START use image with logo
+        if ADDON.getSetting('prefer_image_logo') == 'true':        
+            images = episode['images']    
+            item_data['iconimage'] = SelectImage(images)
+            item_data['fanart'] = episode['images']['standard'].replace('{recipe}', '832x468')
         # BBC-007: END use image with logo
 
         # BBC-011: START extract episode title, season number and episode number from episode data
@@ -1402,12 +1435,12 @@ def ListRecommendations(item_id=None):
                     # BBC-008: END debug
                         
                     # BBC-007: START use image with logo                                          
-                    # get image
                     images = episode['image']
-                    item_data['iconimage'] = custom_select_image(images)                    
-                    # get durations - not working ?
-                    item_data['total_time'] = episode['versions'][0]['duration']['text'].replace(' mins', '')
+                    item_data['iconimage'] = SelectImage(images)
                     # BBC-007: END use image with logo                      
+                    
+                    # BBC-004: get durations - not working?                      
+                    item_data['total_time'] = episode['versions'][0]['duration']['text'].replace(' mins', '')
                     
                     # BBC-006: START create AF3 style episode header
                     title = episode['title']['default']
@@ -1772,7 +1805,7 @@ def ScrapeJSON(html):
 # BBC-011: Custom ListWatching Processing
 # def CheckAutoplay(name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
 def CheckAutoplay(name, url, iconimage, listwatching=False, showtitle='', episode_title='', season=0, episode=0, episode_fanart='',
-                  description='', fanart='', aired=None, resume_time="", total_time="", context_mnu=None):
+                  description='', aired=None, fanart='', resume_time="", total_time="", context_mnu=None):
     if ADDON.getSetting('streams_autoplay') == 'true':
         mode = 202
     else:

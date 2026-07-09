@@ -104,6 +104,11 @@ msgctxt "#30190"
 msgid "Show Red Button warning"
 msgstr ""
 
+# BBC-007: Use image with logo
+msgctxt "#30191"
+msgid "Prefer images with logo"
+msgstr ""
+
 msgctxt "#30200"
 msgid "Streams"
 msgstr ""

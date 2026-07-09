@@ -106,6 +106,13 @@
                                     <default>true</default>
                                     <control type="toggle"/>
                                 </setting>
+                                <!-- BBC-007: START Use image with logo -->
+                                <setting id="prefer_image_logo" type="boolean" label="30191" help="">
+                                    <level>0</level>
+                                    <default>false</default>
+                                    <control type="toggle"/>
+                                </setting>
+                                <!-- BBC-007: END Use image with logo -->
 			</group>
 			<group id="2" label="30102">
                                 <setting id="radio_paginate_episodes" type="integer" label="30170" help="">

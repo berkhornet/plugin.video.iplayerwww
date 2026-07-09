@@ -69,18 +69,6 @@ def strip_after(text: str, marker: str) -> str:
     return text  # Marker not found, return original
 
 
-def custom_select_image(images):
-    if not images:
-        return 'DefaultFolder.png'
-    return(images.get('promotional_with_logo')
-           or images.get('promotionalWithLogo') # Recommendations
-           or images.get('promotional')
-           or images.get('standard')
-           or images.get('default') # Recommendations
-           or images.get('portrait')
-           or 'DefaultFolder.png').replace('{recipe}', '832x468') 
-
-
 def create_af3_style_episode_header(subtitle, title, debug, itemtype):
     """
     Creates an AF3 style "Episode Header" from different iPlayer episode "subtitle" formats
