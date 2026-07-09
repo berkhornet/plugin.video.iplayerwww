@@ -68,7 +68,7 @@ def strip_after(text: str, marker: str) -> str:
         return text[:index]  # Keep everything before marker
     return text  # Marker not found, return original
 
-
+# BBC-006: START def create_af3_style_episode_header
 def create_af3_style_episode_header(subtitle, title, debug, itemtype):
     """
     Creates an AF3 style "Episode Header" from different iPlayer episode "subtitle" formats
@@ -213,8 +213,10 @@ def create_af3_style_episode_header(subtitle, title, debug, itemtype):
         log_message('create_af3_style_episode_header: Format 1/2/3 output = ' + af3_episode_header_colour)
 
     return af3_episode_header_colour
+# BBC-006: END def create_af3_style_episode_header
+    
 
-# BBC-010: START def get_episode_data
+# BBC-011: START def get_episode_data
 def get_episode_data(subtitle, title, debug, itemtype):
     """
     Creates an AF3 style "Episode Header" from different iPlayer episode "subtitle" formats
@@ -354,7 +356,7 @@ def get_episode_data(subtitle, title, debug, itemtype):
         log_message('get_episode_data: Format 1/2/3 output = ' + af3_episode_header_colour)
     isEpisode = True
     return isEpisode, episode_title, str(series_nr), episode_nr_pad_str    
-# BBC-010: END def get_episode_data
+# BBC-011: END def get_episode_data
     
     
 # BBC-011: START functions to get data from the TMDb
