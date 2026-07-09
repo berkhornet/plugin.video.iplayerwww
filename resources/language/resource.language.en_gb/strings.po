@@ -109,9 +109,17 @@ msgctxt "#30191"
 msgid "Prefer images with logo"
 msgstr ""
 
-# BBC-012: Option for concise titles
 msgctxt "#30192"
+msgid "Use artwork with logos if available"
+msgstr ""
+
+# BBC-012: Option for concise titles
+msgctxt "#30193"
 msgid "Prefer concise titles"
+msgstr ""
+
+msgctxt "#30194"
+msgid "Remove extraneous text and highlighting from titles"
 msgstr ""
 
 msgctxt "#30200"

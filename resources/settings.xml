@@ -107,14 +107,14 @@
                                     <control type="toggle"/>
                                 </setting>
                                 <!-- BBC-007: START Use image with logo -->
-                                <setting id="prefer_image_logo" type="boolean" label="30191" help="Use artwork with logos if available">
+                                <setting id="prefer_image_logo" type="boolean" label="30191" help="30192">
                                     <level>0</level>
                                     <default>false</default>
                                     <control type="toggle"/>
                                 </setting>
                                 <!-- BBC-007: END Use image with logo -->
                                 <!-- BBC-012: START Option for concise titles -->
-                                <setting id="prefer_concise_titles" type="boolean" label="30192" help="Remove extraneous text and highlighting from titles">
+                                <setting id="prefer_concise_titles" type="boolean" label="30193" help="30194">
                                     <level>0</level>
                                     <default>false</default>
                                     <control type="toggle"/>
