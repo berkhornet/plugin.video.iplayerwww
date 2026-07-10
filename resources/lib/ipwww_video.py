@@ -651,7 +651,10 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
     if debug == True:
         log_message('ParseSingleJSON: meta = ' + str(meta))
         log_message('ParseSingleJSON: item = ' + str(item))
-    # BBC-008: END debug        
+    # BBC-008: END debug 
+
+    # BBC-007: define fanart ## TODO get fanart working!
+    fanart = ''    
         
     if 'episode' in item:
         subitem = item['episode']
@@ -699,6 +702,8 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
         if subitem.get('image'):
             images = subitem['image']
             icon = SelectImage(images)
+            if 'default' in subitem.get('image'):
+                fanart = subitem['image'].get('default').replace("{recipe}","832x468") 
         # BBC-007: END use images with logo
             
     else:
@@ -787,6 +792,7 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
         if 'images' in item:
             images = item['images']    
             icon = SelectImage(images)
+            fanart = item['images']['standard'].replace("{recipe}","832x468")
         # BBC-007: END use images with logo
             
         elif 'sources' in item:
@@ -1141,7 +1147,7 @@ def ParseProgramme(progr_data, playable=False):
     else:
         programme.update({
             'iconimage': SelectImage(progr_data['initial_children'][0]['images']),
-            'fanart': progr_data['images']['standard'].replace('{recipe}', '832x468'),
+            'wl_fanart': progr_data['images']['standard'].replace('{recipe}', '832x468'),
             'description': SelectSynopsis(progr_data['synopses'])
         })        
     # BBC-007: END use image with logo
@@ -1373,32 +1379,39 @@ def ListWatching():
         if ADDON.getSetting('prefer_image_logo') == 'true':        
             images = episode['images']    
             item_data['iconimage'] = SelectImage(images)
-            item_data['fanart'] = episode['images']['standard'].replace('{recipe}', '832x468')
         # BBC-007: END use image with logo
 
-        # BBC-011: START extract episode title, season number and episode number from episode data
-        try:
-            description = episode['subtitle']
-            title = ""
-            itemtype = ''
-        except Exception: # probably a movie
-            description = episode['title'] 
-            title = episode['title'] 
-            itemtype = 'movie'  
-        isEpisode, episode_title, season_nr, episode_nr = get_episode_data(description, title, debug, itemtype)
-        item_data['name'] = episode_title
-        item_data['description'] = "No plot information available."
-        item_data['episode_title'] = episode_title
-        item_data['season'] = season_nr
-        item_data['episode'] = episode_nr       
-        # BBC-011: END extract episode title, season number and episode number from episode data
-         
+        # BBC-011: START Enhanced ListWatching Processing
         # Lacking a field synopses, a watching item's description is empty. Since the
         # remaining playtime is presented in the title instead of the usual episode name,
         # place the original title/sub-title in the description.
+        # item_data['description'] = item_data['name']
+        if ADDON.getSetting('enhanced_listwatching') == 'false':        
+            item_data['description'] = item_data['name']
+        else:        
+            try:
+                description = episode['subtitle']
+                title = ""
+                itemtype = ''
+            except Exception: # probably a movie
+                description = episode['title'] 
+                title = episode['title'] 
+                itemtype = 'movie'  
+            isEpisode, episode_title, season_nr, episode_nr = get_episode_data(description, title, debug, itemtype)
+            item_data['name'] = episode_title
+            item_data['description'] = "No plot information available."
+            item_data['listwatching'] = True
+            if isEpisode == True:            
+                item_data['showtitle'] = episode['title']
+            else:
+                item_data['showtitle'] = item_data['name']               
+            item_data['episode_title'] = episode_title
+            item_data['season'] = season_nr
+            item_data['episode'] = episode_nr
+            item_data['lw_fanart'] = episode['images']['standard'].replace('{recipe}', '832x468')
+            item_data['wl_fanart'] = ''          
+        # BBC-011: END Enhanced ListWatching Processing
         
-        # BBC-011: Plot will be obtained from TMDb by AddMenuEntry
-
         remaining_seconds = watching_item.get('remaining')
         if remaining_seconds:
             total_seconds = int(remaining_seconds * 100 / (100 - watching_item.get('progress', 0)))
@@ -1436,16 +1449,7 @@ def ListWatching():
             ct_menus.append((translation(30601),
                              f'RunPlugin(plugin://plugin.video.iplayerwww?mode=301&episode_id={programme_id}&url=url)'))
 
-        # BBC-011: START custom AddMenuEntry
-        item_data['episode_fanart'] = episode['images']['standard'].replace('{recipe}', '832x468')
-        item_data['listwatching'] = True
-        if isEpisode == True:
-            item_data['showtitle'] = episode['title']
-            CheckAutoplay(**item_data)
-        else:
-            item_data['showtitle'] = item_data['name']
-            CheckAutoplay(**item_data)
-        # BBC-011: END custom AddMenuEntry
+        CheckAutoplay(**item_data)
 
 
 def RemoveWatching(episode_id):
@@ -1884,17 +1888,18 @@ def ScrapeJSON(html):
 # BBC-007: add fanart to parameters for Watchlist
 # BBC-011: Custom ListWatching Processing
 # def CheckAutoplay(name, url, iconimage, description, aired=None, resume_time="", total_time="", context_mnu=None):
-def CheckAutoplay(name, url, iconimage, listwatching=False, showtitle='', episode_title='', season=0, episode=0, episode_fanart='',
-                  description='', aired=None, fanart='', resume_time="", total_time="", context_mnu=None):
+def CheckAutoplay(name, url, iconimage, listwatching=False, showtitle='', episode_title='', season=0, episode=0, lw_fanart='',
+                  description='', aired=None, wl_fanart='', resume_time="", total_time="", context_mnu=None):
     if ADDON.getSetting('streams_autoplay') == 'true':
         mode = 202
     else:
         mode = 122
-    # BBC-007: add fanart to parameters for Watchlist    
+    # BBC-007: add fanart to parameters for Watchlist
+    # BBC-011: Custom ListWatching and Watchlist Processing    
     # AddMenuEntry(name, url, mode, iconimage, description, '', aired=aired,
                  # resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)
-    AddMenuEntry(name, url, mode, iconimage, listwatching, showtitle, episode_title, season, episode, episode_fanart, 
-                 description, fanart, aired=aired, resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)                 
+    AddMenuEntry(name, url, mode, iconimage, listwatching, showtitle, episode_title, season, episode, lw_fanart, 
+                 description, wl_fanart, aired=aired, resume_time=resume_time, total_time=total_time, context_mnu=context_mnu)                 
 
 
 def GetSchedules(channel_list):

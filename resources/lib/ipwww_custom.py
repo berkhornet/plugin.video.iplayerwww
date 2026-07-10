@@ -25,6 +25,8 @@ try:
 except:
     import http.cookiejar
     cookielib = http.cookiejar
+    
+ADDON = xbmcaddon.Addon(id='plugin.video.iplayerwww')    
 
          
 def log_message(message, level=xbmc.LOGINFO):
@@ -367,7 +369,7 @@ def search_tmdb(category, name):
     category: 'tv' or 'movie'
     """
     
-    API_KEY = "e92d7c9d19df047c576ee8724f174e07"  # Replace with your TMDb API key
+    API_KEY = ADDON.getSetting('tmdb_api_key')  # Replace with your TMDb API key
     BASE_URL = "https://api.themoviedb.org/3"
     
     if not name or not isinstance(name, str):
@@ -408,7 +410,7 @@ def get_episode_info(tv_id, season_number, episode_number, language="en-US"):
     """
     url = f"https://api.themoviedb.org/3/tv/{tv_id}/season/{season_number}/episode/{episode_number}"
     params = {
-        "api_key": 'e92d7c9d19df047c576ee8724f174e07',
+        "api_key": ADDON.getSetting('tmdb_api_key'),
         "language": language
     }
 
@@ -443,7 +445,7 @@ def get_movie_info(movie_id):
     """
     Fetch movie details from TMDB API by movie ID.
     """
-    API_KEY = "e92d7c9d19df047c576ee8724f174e07"  # Replace with your TMDB API key
+    API_KEY = ADDON.getSetting('tmdb_api_key')  # Replace with your TMDB API key
     BASE_URL = "https://api.themoviedb.org/3"
     
     try:
@@ -496,7 +498,7 @@ def get_first_english_backdrop(show_title) -> str:
         str: Full URL of the first English backdrop, or None if not found.
     """
     
-    api_key = "e92d7c9d19df047c576ee8724f174e07"
+    api_key = ADDON.getSetting('tmdb_api_key')
     
     # establish if title is a TV Show or Movie
     tmdb_id, tmdb_type = search_tmdb('tv', show_title) # try to get tmdb_id for TV Show

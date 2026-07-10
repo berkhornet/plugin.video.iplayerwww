@@ -120,6 +120,26 @@
                                     <control type="toggle"/>
                                 </setting>
                                 <!-- BBC-012: END Option for concise titles -->
+                                <!-- BBC-011: START Enhanced ListWatching and Watchlist-->
+                                <setting id="enhanced_listwatching" type="boolean" label="30195" help="30196">
+                                    <level>0</level>
+                                    <default>false</default>
+                                    <control type="toggle"/>
+                                </setting>
+                                <setting id="tmdb_api_key" type="string" label="30197" help="30198" parent="enhanced_listwatching">
+                                    <level>0</level>
+                                    <default/>
+                                    <control type="edit" format="string">
+                                        <heading>30197</heading>
+                                    </control>
+                                    <dependencies>
+                                        <dependency type="enable" setting="enhanced_listwatching">true</dependency>
+                                    </dependencies>
+                                    <constraints>
+                                        <allowempty>true</allowempty>
+                                    </constraints>
+                                </setting>
+                                <!-- BBC-011: END Enhanced ListWatching and Watchlist-->                              
 			</group>
 			<group id="2" label="30102">
                                 <setting id="radio_paginate_episodes" type="integer" label="30170" help="">

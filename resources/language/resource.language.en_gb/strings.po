@@ -122,6 +122,23 @@ msgctxt "#30194"
 msgid "Remove extraneous text and highlighting from titles"
 msgstr ""
 
+# BBC-011: Enhanced ListWatching
+msgctxt "#30195"
+msgid "Enhance Continue Watching and Watchlist Processing"
+msgstr ""
+
+msgctxt "#30196"
+msgid "Requires TMDb API key. Adds plot, landscape and fanart artwork when available."
+msgstr ""
+
+msgctxt "#30197"
+msgid "TMDb API key"
+msgstr ""
+
+msgctxt "#30198"
+msgid "Enter your TMDb API key"
+msgstr ""
+
 msgctxt "#30200"
 msgid "Streams"
 msgstr ""
