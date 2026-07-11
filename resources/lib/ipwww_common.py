@@ -27,6 +27,12 @@ except:
 
 ADDON = xbmcaddon.Addon(id='plugin.video.iplayerwww')
 
+# BBC-008: Get debug setting
+if ADDON.getSetting('debug_additional_options') == 'true':
+    debug = True
+else:
+    debug = False
+
 # BBC-001: Use iPlayer artwork 
 HOME              = xbmcvfs.translatePath('special://userdata/')
 CUSTOMISATIONS    = os.path.join(HOME,     'customisations')
@@ -42,7 +48,6 @@ media_dir = xbmcvfs.translatePath('special://userdata/customisations/Addon Icons
 # BBC-009: END Custom root (Main menu)
 
 # BBC-008: START debug
-debug = True
 def log_message(message, level=xbmc.LOGINFO):
     """
     Logs a message to the Kodi log file.
@@ -519,7 +524,7 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
     """Adds a new line to the Kodi list of playables.
     It is used in multiple ways in the plugin, which are distinguished by modes.
     """ 
-    
+
     if not iconimage:
         # BBC-001: Use iPlayer artwork 
         # iconimage="DefaultFolder.png"

@@ -36,16 +36,21 @@ fanartpath        = os.path.join(FANARTFOLDER,     'BBC iPlayer 3.png')
 iconpath          = os.path.join(ICONFOLDER,       'BBC iPlayer Icon v2.png')
 # BBC-001: END Use iPlayer artwork
 
+# BBC-008: Get debug setting
+if ADDON.getSetting('debug_additional_options') == 'true':
+    debug = True
+else:
+    debug = False
+    
 # BBC-004: START import custom functions
-debug = True
 from .ipwww_custom import log_message
 from .ipwww_custom import strip_before
 from .ipwww_custom import strip_after
 from .ipwww_custom import create_af3_style_episode_header
 from .ipwww_custom import get_episode_data
-
 import requests
-# BBC-004: END import custom functions       
+# BBC-004: END import custom functions   
+
 
 def tp(path):
     return xbmcvfs.translatePath(path)
