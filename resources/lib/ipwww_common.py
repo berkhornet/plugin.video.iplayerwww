@@ -562,15 +562,7 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
     listitem = xbmcgui.ListItem(label=name, label2=description)
     listitem.setArt({'icon':'DefaultFolder.png', 'thumb':iconimage})
     
-    # BBC-011: START Enhanced Watchlist Processing 
-    if len(wl_fanart) > 0: # Watchlist item
-        listitem.setArt({'landscape':iconimage})
-        listitem.setArt({'fanart': wl_fanart})
-    elif mode in (128, 139, 202):
-        listitem.setArt({'fanart':iconimage}) 
-    # BBC-011: END Enhanced Watchlist Processing 
-    
-    # BBC-011: START Enhanced ListWatching Processing   
+    # BBC-011: START Enhanced ListWatching metadata  
     if listwatching == True:
         from resources.lib.ipwww_custom import (search_tmdb, get_movie_info, get_episode_info)
         # Clean up input data
@@ -629,6 +621,13 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
             listitem.addContextMenuItems(context_mnu)
 
     if listwatching == False:
+        # BBC-007: START Use image with logo
+        if len(wl_fanart) > 0: # Watchlist item
+            listitem.setArt({'landscape':iconimage})
+            listitem.setArt({'fanart': wl_fanart})
+        elif mode in (128, 139, 202):
+            listitem.setArt({'fanart':iconimage}) 
+        # BBC-007: END use image with logo
         if mode in (201, 202, 203, 204, 205, 211, 212, 213):
             if aired:
                 listitem.setInfo("video", {
@@ -665,7 +664,7 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
                     "plotoutline": description})
         if context_mnu:
             listitem.addContextMenuItems(context_mnu)
-    # BBC-011: END Enhanced ListWatching Processing   
+    # BBC-011: END Enhanced ListWatching metadata   
 
     video_streaminfo = {'codec': 'h264'}
     if not isFolder:

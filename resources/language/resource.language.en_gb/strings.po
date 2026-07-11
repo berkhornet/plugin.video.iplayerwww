@@ -522,7 +522,7 @@ msgid "Prefer images with logo"
 msgstr ""
 
 msgctxt "#30902"
-msgid "Use artwork with logos if available"
+msgid "(BBC-007) Use artwork with logos if available"
 msgstr ""
 
 # BBC-012: Option for concise titles
@@ -531,12 +531,12 @@ msgid "Prefer concise titles"
 msgstr ""
 
 msgctxt "#30904"
-msgid "Remove extraneous text and highlighting from titles"
+msgid "(BBC-012) Remove extraneous text and highlighting from titles"
 msgstr ""
 
 # BBC-011: Enhanced ListWatching
 msgctxt "#30905"
-msgid "Enhance Continue Watching and Watchlist Processing"
+msgid "Enhanced Continue Watching metadata"
 msgstr ""
 
 msgctxt "#30906"
@@ -560,3 +560,15 @@ msgctxt "#30910"
 msgid "Include debug entries in Kodi log file"
 msgstr ""
 
+# BBC-XXX: Create Extras Category
+msgctxt "#30911"
+msgid "Enhancements"
+msgstr ""
+
+msgctxt "#30912"
+msgid "Enhancements"
+msgstr ""
+
+msgctxt "#30913"
+msgid "Debug Enhancements"
+msgstr ""
