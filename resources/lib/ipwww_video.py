@@ -800,6 +800,8 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
             icon = re.sub(r'ic/.+?/','ic/832x468/',temp)
 
     if num_episodes:
+        if debug == True:
+            log_message("ParseSingle JSON: LINE 804 REACHED")
         if not main_url in added_directories:
             # BBC-012: START remove "x episodes available" from title
             # title = '[B]'+item['title']+'[/B] - '+num_episodes+' episodes available'
@@ -811,11 +813,13 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
             # BBC-011: START updated argument list needed                           
             # AddMenuEntry(title, main_url, 139, icon, synopsis, '')            
             AddMenuEntry(title, episodes_url, 139, icon, False, '', '', 0, 0, '', 
-                         synopsis, '','', '', '', '', '', '', '', None, '')                        
+                         synopsis, fanart, '', '', '', '', '', '', '', None, '')                        
             # BBC-011: END updated argument list needed                                                 
             added_directories.append(main_url)
 
     elif episodes_url:
+        if debug == True:
+            log_message("ParseSingle JSON: LINE 822 REACHED")
         if not episodes_url in added_directories:
             if episodes_title=='':
                 episodes_title = title              
@@ -827,7 +831,7 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
                 # AddMenuEntry('[B]%s[/B]' % (episodes_title),
                              # episodes_url, 128, icon, synopsis, '')
                 AddMenuEntry('B]%s[/B]' % (episodes_title), episodes_url, 128, icon, False, '', '', 0, 0, '', 
-                         synopsis, fanart,'', '', '', '', '', '', '', None, '')
+                         synopsis, fanart, '', '', '', '', '', '', '', None, '')
                 # BBC-011: END updated argument list needed                                        
             else:
                 # BBC-011: START updated argument list needed                
@@ -840,6 +844,8 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
             added_directories.append(main_url)
     
     elif main_url:
+        if debug == True:
+            log_message("ParseSingle JSON: LINE 848 REACHED")       
         if not main_url in added_playables:
             # BBC-011: START updated argument list needed
             # CheckAutoplay(title , main_url, icon, synopsis, aired)
@@ -1528,6 +1534,11 @@ def ListRecommendations(item_id=None):
                     # BBC-007: START use image with logo                                          
                     images = episode['image']
                     item_data['iconimage'] = SelectImage(images)
+                    item_data['wl_fanart'] = ''
+                    if episode['image']['default']:
+                        item_data['wl_fanart'] = episode['image']['default'].replace("{recipe}","832x468")
+                    elif episode['image']['promotional']:
+                        item_data['wl_fanart'] = episode['image']['promotional'].replace("{recipe}","832x468")
                     # BBC-007: END use image with logo                      
                     
                     # BBC-004: get durations - not working?                      
