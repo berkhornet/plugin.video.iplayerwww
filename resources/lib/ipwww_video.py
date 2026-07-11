@@ -807,14 +807,18 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
                 title = '[B]'+item['title']+'[/B] - '+num_episodes+' episodes available'
             else:
                 title = item['title']
-            # BBC-012: END remove "x episodes available" from title              
-            AddMenuEntry(title, main_url, 139, icon, synopsis, '')
+            # BBC-012: END remove "x episodes available" from title
+            # BBC-011: START updated argument list needed                           
+            # AddMenuEntry(title, main_url, 139, icon, synopsis, '')            
+            AddMenuEntry(title, episodes_url, 139, icon, False, '', '', 0, 0, '', 
+                         synopsis, '','', '', '', '', '', '', '', None, '')                        
+            # BBC-011: END updated argument list needed                                                 
             added_directories.append(main_url)
 
     elif episodes_url:
         if not episodes_url in added_directories:
             if episodes_title=='':
-                episodes_title = title
+                episodes_title = title              
             # BBC-012: START remove Bold highlight
             # AddMenuEntry('[B]%s[/B]' % (episodes_title),
             #              episodes_url, 128, icon, synopsis, '')
@@ -823,22 +827,25 @@ def ParseSingleJSON(meta, item, name, added_playables, added_directories):
                 # AddMenuEntry('[B]%s[/B]' % (episodes_title),
                              # episodes_url, 128, icon, synopsis, '')
                 AddMenuEntry('B]%s[/B]' % (episodes_title), episodes_url, 128, icon, False, '', '', 0, 0, '', 
-                         synopsis, '','', '', '', '', '', '', '', None, '')
+                         synopsis, fanart,'', '', '', '', '', '', '', None, '')
                 # BBC-011: END updated argument list needed                                        
             else:
                 # BBC-011: START updated argument list needed                
                 # AddMenuEntry('%s' % (episodes_title),
                              # episodes_url, 128, icon, synopsis, '')
                 AddMenuEntry('%s' % (episodes_title), episodes_url, 128, icon, False, '', '', 0, 0, '', 
-                         synopsis, '','', '', '', '', '', '', '', None, '')                              
+                         synopsis, fanart,'', '', '', '', '', '', '', None, '')                              
                 # BBC-011: END updated argument list needed                                                                   
             # BBC-012: END remove Bold highlight               
             added_directories.append(main_url)
+    
     elif main_url:
         if not main_url in added_playables:
-            # BBC-011: updated argument list needed
+            # BBC-011: START updated argument list needed
             # CheckAutoplay(title , main_url, icon, synopsis, aired)
-            CheckAutoplay(title, main_url, icon, False, '', '', 0, 0, '', synopsis, '', aired, '', '', None)
+            CheckAutoplay(title, main_url, icon, False, '', '', 0, 0, '', synopsis, None, fanart, '', '', None)
+            # BBC-011: END updated argument list needed                                                                   
+            
             added_playables.append(main_url)
 
 
