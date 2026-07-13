@@ -516,10 +516,10 @@ def strptime(dt_str: str, format: str):
 # BBC-007 and BBC-011: Custom defintion for AddMenuEntry
 # def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', aired=None, resolution=None,
                  #resume_time='', total_time='', episode_id='', stream_id='', context_mnu=None, replay_chan_id=''):  
-
-def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', episode_title='', season=0, episode=0, lw_fanart='', 
-                 description='', wl_fanart='',subtitles_url='', aired=None, resolution=None,
-                 resume_time='', total_time='', episode_id='', stream_id='', context_mnu=None, replay_chan_id=''):
+                     
+def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', aired=None, resolution=None,
+                 resume_time='', total_time='', episode_id='', stream_id='', context_mnu=None, replay_chan_id='',
+                 listwatching=False, showtitle='', episode_title='', season=0, episode=0, fanart=''):
 
     """Adds a new line to the Kodi list of playables.
     It is used in multiple ways in the plugin, which are distinguished by modes.
@@ -591,7 +591,7 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
             info_tag.setMediaType("episode")
             info_tag.setDuration(int(total_time))
 
-            listitem.setArt({'fanart': lw_fanart})
+            listitem.setArt({'fanart': fanart})
             listitem.setArt({'landscape': iconimage})
             
         elif tmdb_type == 'movie':
@@ -603,7 +603,7 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
             info_tag.setMediaType("movie")
             info_tag.setDuration(int(total_time))
             
-            listitem.setArt({'fanart': lw_fanart})
+            listitem.setArt({'fanart': fanart})
             listitem.setArt({'landscape': iconimage})
             
         else:
@@ -622,9 +622,9 @@ def AddMenuEntry(name, url, mode, iconimage, listwatching=False, showtitle='', e
 
     if listwatching == False:
         # BBC-007: START Use image with logo
-        if len(wl_fanart) > 0: # Watchlist item
+        if len(fanart) > 0: # Watchlist item
             listitem.setArt({'landscape':iconimage})
-            listitem.setArt({'fanart': wl_fanart})
+            listitem.setArt({'fanart': fanart})
         elif mode in (128, 139, 202):
             listitem.setArt({'fanart':iconimage}) 
         # BBC-007: END use image with logo
