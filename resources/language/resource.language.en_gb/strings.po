@@ -522,7 +522,7 @@ msgid "Prefer images with logo"
 msgstr ""
 
 msgctxt "#30902"
-msgid "(BBC-007) Use artwork with logos if available"
+msgid "(BBC-007) If available, use artwork with logos for icons and without logos for fanart."
 msgstr ""
 
 # BBC-012: Option for concise titles
@@ -531,16 +531,16 @@ msgid "Prefer concise titles"
 msgstr ""
 
 msgctxt "#30904"
-msgid "(BBC-012) Remove extraneous text and highlighting from titles"
+msgid "(BBC-012) Remove extraneous text and highlighting from titles."
 msgstr ""
 
 # BBC-011: Enhanced ListWatching
 msgctxt "#30905"
-msgid "Enhanced Continue Watching metadata"
+msgid "(BBC-011) Enhanced Continue Watching metadata"
 msgstr ""
 
 msgctxt "#30906"
-msgid "Requires TMDb API key. Adds plot, landscape and fanart artwork when available."
+msgid " Continue Watching: Obtain plot, aired/premiered date and tagline(for movies) from TMDb (Requires TMDb API key)."
 msgstr ""
 
 msgctxt "#30907"
@@ -548,7 +548,7 @@ msgid "TMDb API key"
 msgstr ""
 
 msgctxt "#30198"
-msgid "Enter your TMDb API key"
+msgid "Enter your TMDb API key."
 msgstr ""
 
 # BBC-008: Debug Additional Options
@@ -557,18 +557,18 @@ msgid "Debug addtional options"
 msgstr ""
 
 msgctxt "#30910"
-msgid "Include debug entries in Kodi log file"
+msgid "Include debug entries in Kodi log file."
 msgstr ""
 
 # BBC-XXX: Create Extras Category
 msgctxt "#30911"
-msgid "Enhancements"
+msgid "Video Options"
 msgstr ""
 
 msgctxt "#30912"
-msgid "Enhancements"
+msgid "Video Options"
 msgstr ""
 
 msgctxt "#30913"
-msgid "Debug Enhancements"
+msgid "Debug Video Options"
 msgstr ""
