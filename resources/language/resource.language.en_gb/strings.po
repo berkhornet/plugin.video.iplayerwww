@@ -536,11 +536,11 @@ msgstr ""
 
 # BBC-011: Enhanced ListWatching
 msgctxt "#30905"
-msgid "(BBC-011) Enhanced Continue Watching metadata"
+msgid "Enhanced Continue Watching metadata"
 msgstr ""
 
 msgctxt "#30906"
-msgid " Continue Watching: Obtain plot, aired/premiered date and tagline(for movies) from TMDb (Requires TMDb API key)."
+msgid "(BBC-011) Continue Watching: Obtain plot, aired/premiered date and tagline(for movies) from TMDb (Requires TMDb API key)."
 msgstr ""
 
 msgctxt "#30907"
