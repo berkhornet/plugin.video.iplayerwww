@@ -1452,6 +1452,8 @@ def ListWatching():
             if isEpisode == True:            
                 bbc_011_args['showtitle'] = episode['title']
             else:
+                if not item_data['name']:
+                    item_data['name'] = ' '                
                 bbc_011_args['showtitle'] = item_data['name']
             bbc_011_args['episode_title'] = episode_title
             bbc_011_args['season'] = season_nr
