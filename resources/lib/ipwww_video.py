@@ -127,6 +127,10 @@ def ListRedButton():
 
 
 def ListUHDTrial():
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "UHD Trial")
+    # BBC-014: END Make Addon Section available to Skin    
     channel_list = [
         ('uhd_stream_01',  'UHD Trial 1'),
         ('uhd_stream_02',  'UHD Trial 2'),
@@ -155,6 +159,10 @@ def AddAvailableUHDTrialItem(name, channelname):
 
 # ListLive creates menu entries for all live channels.
 def ListLive():
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "Watch Live")
+    # BBC-014: END Make Addon Section available to Skin
     channel_list = [
         ('bbc_one_hd',                       'BBC One',                  'bbc_one_london'),
         ('bbc_two_england',                  'BBC Two',                  'bbc_two_england'),
@@ -232,7 +240,10 @@ def ListAtoZ():
     
     # BBC-003: Custom viewtypes
     xbmcplugin.setContent(int(sys.argv[1]), 'files')
-    
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "List A-Z")
+    # BBC-014: END Make Addon Section available to Skin   
     characters = [
         ('A', 'a'), ('B', 'b'), ('C', 'c'), ('D', 'd'), ('E', 'e'), ('F', 'f'),
         ('G', 'g'), ('H', 'h'), ('I', 'i'), ('J', 'j'), ('K', 'k'), ('L', 'l'),
@@ -574,7 +585,10 @@ def ListCategories():
     
     # BBC-003: Custom viewtypes
     xbmcplugin.setContent(int(sys.argv[1]), 'files')
-    
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "Categories")
+    # BBC-014: END Make Addon Section available to Skin   
     html = OpenURL('https://www.bbc.co.uk/iplayer')
     match = re.compile(
         '<a href="/iplayer/categories/(.+?)/featured".*?><span class="lnk__label">(.+?)</span>'
@@ -1232,7 +1246,10 @@ def ListHighlights(highlights_url):
     
     # BBC-003: Custom viewtypes
     xbmcplugin.setContent(int(sys.argv[1]), 'videos')
-
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "Highlights")
+    # BBC-014: END Make Addon Section available to Skin
     current_url = 'https://www.bbc.co.uk/%s' % highlights_url
     html = OpenURL(current_url)
 
@@ -1246,7 +1263,10 @@ def ListMostPopular():
     
     # BBC-003: Custom viewtypes
     xbmcplugin.setContent(int(sys.argv[1]), 'videos')
-    
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "Most Popular")
+    # BBC-014: END Make Addon Section available to Skin    
     current_url = 'https://www.bbc.co.uk/iplayer/group/most-popular'
     html = OpenURL(current_url)
 
@@ -1316,6 +1336,10 @@ def GetAvailableStreams(name, url, iconimage, description, resume_time='', total
 
 
 def Search(search_entered):
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "Search")
+    # BBC-014: END Make Addon Section available to Skin
     """Simply calls the online search function. The search is then evaluated in EvaluateSearch."""
     if search_entered is None:
         keyboard = xbmc.Keyboard('', 'Search iPlayer')
@@ -1392,7 +1416,12 @@ def GetJsonDataWithBBCid(url, retry=True):
 def ListWatching():   
     # BBC-003: Custom viewtypes
     xbmcplugin.setContent(int(sys.argv[1]), 'episodes')
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "Continue Watching")
+    # BBC-014: END Make Addon Section available to Skin
     
+    # window.clearProperty("CustomAddonSection")    
     url = "https://www.bbc.co.uk/iplayer/continue-watching"
     data = GetJsonDataWithBBCid(url)
         
@@ -1453,7 +1482,7 @@ def ListWatching():
                 bbc_011_args['showtitle'] = episode['title']
             else:
                 if not item_data['name']:
-                    item_data['name'] = ' '                
+                    item_data['name'] = ' '
                 bbc_011_args['showtitle'] = item_data['name']
             bbc_011_args['episode_title'] = episode_title
             bbc_011_args['season'] = season_nr
@@ -1518,7 +1547,10 @@ def ListFavourites():
     
     # BBC-003: Custom viewtypes
     xbmcplugin.setContent(int(sys.argv[1]), 'videos')
-    
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "Watchlist")
+    # BBC-014: END Make Addon Section available to Skin   
     data = GetJsonDataWithBBCid("https://www.bbc.co.uk/iplayer/watchlist")
     if not data:
         return
@@ -1548,7 +1580,10 @@ def ListRecommendations(item_id=None):
    
     # BBC-003: Custom viewtypes
     xbmcplugin.setContent(int(sys.argv[1]), 'videos')
-    
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "Recommendations")
+    # BBC-014: END Make Addon Section available to Skin    
     data = GetJsonDataWithBBCid('https://www.bbc.co.uk/iplayer')
     if not data:
         return

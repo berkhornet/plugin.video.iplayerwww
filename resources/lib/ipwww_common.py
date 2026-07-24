@@ -710,6 +710,10 @@ def ShowLicenceWarning():
 
 
 def CreateBaseDirectory(content_type):
+    # BBC-014: START Make Addon Section available to Skin
+    window = xbmcgui.Window(10000)
+    window.setProperty("CustomAddonSection", "Main Menu")
+    # BBC-014: END Make Addon Section available to Skin    
     if ADDON.getSetting('kids_password'):
         if ADDON.getSetting('streams_autoplay') == 'true':
             live_mode = 203
