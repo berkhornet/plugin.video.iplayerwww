@@ -1425,8 +1425,19 @@ def ListWatching():
     url = "https://www.bbc.co.uk/iplayer/continue-watching"
     data = GetJsonDataWithBBCid(url)
         
-    if not data:
-        return
+    # BBC-015: START Custom Empty List Handling            
+    # if not data:
+        # return
+    window_id = xbmcgui.getCurrentWindowId()
+    if not data['items']['elements']:
+        if window_id in (10000, 11101, 11102, 11103, 11104):
+            return
+        else:            
+            list_type = 'Continue Watching'
+            message = "Your BBC iPlayer " + list_type + ' list is empty.'
+            xbmcgui.Dialog().ok('BBC iPlayer', message)
+            sys.exit()        
+    # BBC-015: END Custom Empty List Handling 
 
     for watching_item in data['items']['elements']:
         episode = watching_item['episode']
@@ -1552,8 +1563,20 @@ def ListFavourites():
     window.setProperty("CustomAddonSection", "Watchlist")
     # BBC-014: END Make Addon Section available to Skin   
     data = GetJsonDataWithBBCid("https://www.bbc.co.uk/iplayer/watchlist")
-    if not data:
-        return
+    
+    # BBC-015: START Custom Empty List Handling            
+    # if not data:
+        # return
+    window_id = xbmcgui.getCurrentWindowId()
+    if not data['items']['elements']:
+        if window_id in (10000, 11101, 11102, 11103, 11104):
+            return
+        else:            
+            list_type = 'Watchlist'
+            message = "Your BBC iPlayer " + list_type + ' list is empty.'
+            xbmcgui.Dialog().ok('BBC iPlayer', message)
+            sys.exit()        
+    # BBC-015: END Custom Empty List Handling 
 
     for added_item in data['items']['elements']:
         programme = added_item['programme']
