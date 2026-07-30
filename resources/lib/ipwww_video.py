@@ -1419,9 +1419,9 @@ def ListWatching():
     # BBC-014: START Make Addon Section available to Skin
     window = xbmcgui.Window(10000)
     window.setProperty("CustomAddonSection", "Continue Watching")
+    # window.clearProperty("CustomAddonSection")      
     # BBC-014: END Make Addon Section available to Skin
     
-    # window.clearProperty("CustomAddonSection")    
     url = "https://www.bbc.co.uk/iplayer/continue-watching"
     data = GetJsonDataWithBBCid(url)
         
@@ -1435,7 +1435,8 @@ def ListWatching():
         else:            
             list_type = 'Continue Watching'
             message = "Your BBC iPlayer " + list_type + ' list is empty.'
-            xbmcgui.Dialog().ok('BBC iPlayer', message)
+            # xbmcgui.Dialog().ok('BBC iPlayer', message)
+            xbmcgui.Dialog().notification('BBC iPlayer', message, iconpath, 5000)                        
             sys.exit()        
     # BBC-015: END Custom Empty List Handling 
 
@@ -1574,7 +1575,8 @@ def ListFavourites():
         else:            
             list_type = 'Watchlist'
             message = "Your BBC iPlayer " + list_type + ' list is empty.'
-            xbmcgui.Dialog().ok('BBC iPlayer', message)
+            # xbmcgui.Dialog().ok('BBC iPlayer', message)
+            xbmcgui.Dialog().notification('BBC iPlayer', message, iconpath, 5000)                                   
             sys.exit()        
     # BBC-015: END Custom Empty List Handling 
 
