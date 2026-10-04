@@ -588,6 +588,9 @@ def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', a
             if 'overview' in episode_info:
                 info_tag.setPlot(episode_info['overview'])
                 info_tag.setPlotOutline(episode_info['overview'])
+            else:
+                info_tag.setPlot('Episode number not known - no plot information available.')
+                info_tag.setPlotOutline('Episode number not known - no plot information available.')                
             if 'air_date' in episode_info:
                 info_tag.setPremiered(episode_info['air_date'])
             info_tag.setMediaType("episode")
