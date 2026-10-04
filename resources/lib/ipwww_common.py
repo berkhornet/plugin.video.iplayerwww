@@ -585,9 +585,11 @@ def AddMenuEntry(name, url, mode, iconimage, description='', subtitles_url='', a
             info_tag.setSeason(int(season))
             info_tag.setEpisode(int(episode))
             info_tag.setTitle(episode_title)
-            info_tag.setPlot(episode_info['overview'])
-            info_tag.setPlotOutline(episode_info['overview'])
-            info_tag.setPremiered(episode_info['air_date'])
+            if 'overview' in episode_info:
+                info_tag.setPlot(episode_info['overview'])
+                info_tag.setPlotOutline(episode_info['overview'])
+            if 'air_date' in episode_info:
+                info_tag.setPremiered(episode_info['air_date'])
             info_tag.setMediaType("episode")
             info_tag.setDuration(int(total_time))
 
