@@ -341,7 +341,7 @@ def get_episode_data(subtitle, title, debug, itemtype):
         if debug == True:
             log_message('get_episode_data: Processing Formats 1 and 3 for subtitle = ' + subtitle)
     except Exception: # Format 2
-        episode_nr = 0
+        episode_nr = 99 # set to 99 to indicate not known but allow correct formatting when viewtype = episode
         if debug == True:
             log_message('get_episode_data: Processing Format 2 for subtitle = ' + subtitle)
     episode_nr_pad = f"{episode_nr:02d}"
